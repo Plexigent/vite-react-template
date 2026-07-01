@@ -89,6 +89,81 @@
 	animation: emergence-float 26s ease-in-out infinite alternate;
 }
 
+.intro-theater {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	pointer-events: none;
+}
+
+.intro-swarm,
+.intro-caterpillar,
+.intro-butterfly-wire {
+	position: absolute;
+	inset: 0;
+}
+
+.intro-swarm {
+	z-index: 1;
+}
+
+.intro-caterpillar {
+	z-index: 2;
+}
+
+.intro-swarm-canvas {
+	position: absolute;
+	inset: 0;
+	display: block;
+	width: 100%;
+	height: 100%;
+}
+
+.intro-caterpillar-line,
+.intro-wire-line {
+	position: absolute;
+	left: var(--line-x);
+	top: var(--line-y);
+	display: block;
+	width: var(--line-width);
+	height: 1.5px;
+	background: linear-gradient(90deg, transparent, rgba(204, 255, 249, 0.92), rgba(121, 240, 164, 0.46), transparent);
+	box-shadow:
+		0 0 0.8rem rgba(139, 255, 241, 0.42),
+		0 0 1.8rem rgba(121, 240, 164, 0.18);
+	opacity: 0;
+	transform: rotate(var(--line-angle));
+	transform-origin: left center;
+}
+
+.intro-caterpillar-line {
+	height: 1.25px;
+	background: linear-gradient(90deg, transparent, rgba(1, 7, 16, 0.78), rgba(7, 24, 42, 0.66), transparent);
+	box-shadow:
+		0 0 0.12rem rgba(255, 255, 255, 0.2),
+		0 0 0.32rem rgba(4, 14, 27, 0.28);
+	mix-blend-mode: multiply;
+}
+
+.intro-caterpillar-line.chrysalis-rim {
+	height: 1.6px;
+	background: linear-gradient(90deg, transparent, rgba(0, 5, 12, 0.84), rgba(4, 19, 34, 0.76), transparent);
+}
+
+.intro-caterpillar-line.caterpillar-definition {
+	height: 1.15px;
+	background: linear-gradient(90deg, transparent, rgba(1, 7, 16, 0.56), rgba(8, 30, 45, 0.46), transparent);
+}
+
+.intro-butterfly-wire .intro-wire-line {
+	background: linear-gradient(90deg, transparent, rgba(235, 255, 253, 0.88), rgba(155, 255, 245, 0.42), transparent);
+	opacity: 0;
+}
+
+.intro-butterfly-wire .intro-wire-line {
+	animation-delay: 120ms;
+}
+
 .dot-field,
 .mesh-lines {
 	position: absolute;
@@ -116,6 +191,8 @@
 	transform: translate(-50%, -50%);
 	animation: dot-pulse 9s ease-in-out infinite alternate;
 	animation-delay: var(--delay);
+	transition: opacity 900ms ease, filter 900ms ease;
+	transition-delay: calc(var(--reveal-order, 0) * 45ms);
 }
 
 .star {
@@ -188,6 +265,8 @@
 	transform-origin: left center;
 	animation: line-current 10s ease-in-out infinite alternate;
 	animation-delay: var(--delay);
+	transition: opacity 900ms ease;
+	transition-delay: calc(var(--reveal-order, 0) * 35ms);
 }
 
 .butterfly-line {
@@ -231,6 +310,9 @@
 	font-size: clamp(4rem, 13vw, 10rem);
 	line-height: 1;
 	transform: translate(-50%, -50%);
+	transition:
+		opacity 900ms ease,
+		transform 900ms cubic-bezier(0.16, 0.84, 0.2, 1);
 }
 
 h1 {
@@ -324,8 +406,8 @@ h1 {
 	cursor: pointer;
 	transform: translateX(-50%) translateY(0);
 	transition:
-		opacity 260ms ease,
-		transform 260ms ease,
+		opacity 520ms ease,
+		transform 520ms ease,
 		filter 260ms ease;
 }
 
@@ -352,9 +434,202 @@ h1 {
 	transform: translateX(-50%) translateY(0.12em) scale(0.82);
 }
 
+.landing.phase-swarm .star,
+.landing.phase-swarm .mesh-dot,
+.landing.phase-swarm .mesh-lines span,
+.landing.phase-swarm .wordmark-stage,
+.landing.phase-caterpillar .mesh-dot,
+.landing.phase-caterpillar .mesh-lines span,
+.landing.phase-caterpillar .wordmark-stage,
+.landing.phase-chrysalis .star,
+.landing.phase-chrysalis .mesh-dot,
+.landing.phase-chrysalis .mesh-lines span,
+.landing.phase-chrysalis .butterfly-body,
+.landing.phase-chrysalis .butterfly-antenna,
+.landing.phase-chrysalis .wing,
+.landing.phase-chrysalis .butterfly-line,
+.landing.phase-chrysalis .wordmark-stage,
+.landing.phase-swarm .question-orb,
+.landing.phase-caterpillar .question-orb,
+.landing.phase-chrysalis .question-orb,
+.landing.phase-reveal .wordmark-stage,
+.landing.phase-reveal .question-orb {
+	opacity: 0;
+	pointer-events: none;
+}
+
+.landing.phase-swarm .wordmark-stage,
+.landing.phase-caterpillar .wordmark-stage,
+.landing.phase-chrysalis .wordmark-stage,
+.landing.phase-reveal .wordmark-stage {
+	transform: translate(-50%, -50%) scale(1.08);
+}
+
+.landing.phase-swarm .butterfly-body,
+.landing.phase-swarm .butterfly-antenna,
+.landing.phase-swarm .wing,
+.landing.phase-swarm .butterfly-line,
+.landing.phase-caterpillar .butterfly-body,
+.landing.phase-caterpillar .butterfly-antenna,
+.landing.phase-caterpillar .wing,
+.landing.phase-caterpillar .butterfly-line {
+	opacity: 0;
+}
+
+.landing.phase-swarm .star,
+.landing.phase-caterpillar .star {
+	opacity: 0;
+}
+
+.landing.phase-reveal .star,
+.landing.phase-reveal .mesh-dot,
+.landing.phase-reveal .butterfly-body,
+.landing.phase-reveal .butterfly-antenna,
+.landing.phase-reveal .wing,
+.landing.phase-reveal .mesh-lines span:not(.butterfly-line),
+.landing.phase-reveal .butterfly-line {
+	opacity: 0;
+}
+
+.landing.phase-done .star,
+.landing.phase-done .mesh-dot,
+.landing.phase-done .butterfly-body,
+.landing.phase-done .butterfly-antenna,
+.landing.phase-done .wing {
+	opacity: var(--dot-opacity);
+}
+
+.landing.phase-done .mesh-lines span:not(.butterfly-line),
+.landing.phase-done .butterfly-line {
+	opacity: var(--line-opacity);
+}
+
+.landing.phase-reveal .star,
+.landing.phase-reveal .mesh-dot {
+	animation:
+		dot-pulse 9s ease-in-out infinite alternate,
+		final-dot-field-in 700ms ease forwards;
+	animation-delay:
+		var(--delay),
+		calc(2920ms + var(--reveal-order, 0) * 20ms);
+}
+
+.landing.phase-reveal .mesh-lines span:not(.butterfly-line) {
+	animation: final-line-field-in 700ms ease forwards;
+	animation-delay: calc(2920ms + var(--reveal-order, 0) * 14ms);
+}
+
+.landing.phase-reveal .intro-caterpillar {
+	opacity: 0;
+	transition: opacity 700ms ease;
+}
+
+.landing.phase-reveal .butterfly-body,
+.landing.phase-reveal .butterfly-antenna,
+.landing.phase-reveal .wing {
+	animation:
+		dot-pulse 9s ease-in-out infinite alternate,
+		final-dot-field-in 700ms ease forwards;
+	animation-delay:
+		var(--delay),
+		calc(2920ms + var(--reveal-order, 0) * 18ms);
+}
+
+.landing.phase-reveal .butterfly-line {
+	animation: final-line-field-in 700ms ease forwards;
+	animation-delay: calc(850ms + var(--reveal-order, 0) * 12ms);
+}
+
+.landing.phase-caterpillar .intro-caterpillar-line.caterpillar-definition {
+	animation: caterpillar-line-in 1500ms ease forwards;
+	animation-delay: calc(var(--line-order, 0) * 42ms);
+}
+
+.landing.phase-chrysalis .intro-caterpillar-line.caterpillar-definition {
+	opacity: 0.32;
+}
+
+.landing.phase-chrysalis .intro-caterpillar-line.chrysalis-rim,
+.landing.phase-chrysalis .intro-caterpillar-line.chrysalis-labyrinth,
+.landing.phase-chrysalis .intro-caterpillar-line.chrysalis-antenna {
+	animation: caterpillar-line-in 1500ms ease forwards;
+	animation-delay: calc(var(--line-order, 0) * 42ms);
+}
+
+.landing.phase-reveal .intro-butterfly-wire .intro-wire-line {
+	animation: intro-wire-in 1400ms ease forwards;
+	animation-delay: calc(2920ms + var(--line-order, 0) * 10ms);
+}
+
+.landing.phase-done .wordmark-stage {
+	opacity: 1;
+	transform: translate(-50%, -50%) scale(1);
+}
+
+.landing.phase-done .question-orb {
+	transition-delay: 700ms;
+}
+
+.landing.phase-swarm .emergence .star,
+.landing.phase-swarm .emergence .mesh-dot,
+.landing.phase-swarm .emergence .butterfly-body,
+.landing.phase-swarm .emergence .butterfly-antenna,
+.landing.phase-swarm .emergence .wing,
+.landing.phase-swarm .emergence .mesh-lines span,
+.landing.phase-caterpillar .emergence .mesh-dot,
+.landing.phase-caterpillar .emergence .star,
+.landing.phase-caterpillar .emergence .butterfly-body,
+.landing.phase-caterpillar .emergence .butterfly-antenna,
+.landing.phase-caterpillar .emergence .wing,
+.landing.phase-caterpillar .emergence .mesh-lines span,
+.landing.phase-chrysalis .emergence .mesh-dot,
+.landing.phase-chrysalis .emergence .star,
+.landing.phase-chrysalis .emergence .butterfly-body,
+.landing.phase-chrysalis .emergence .butterfly-antenna,
+.landing.phase-chrysalis .emergence .wing,
+.landing.phase-chrysalis .emergence .mesh-lines span {
+	opacity: 0 !important;
+	transition-delay: 0ms;
+}
+
 @keyframes drift {
 	to {
 		transform: rotate(1turn) scale(1.08);
+	}
+}
+
+@keyframes residue-reveal {
+	to {
+		opacity: calc(var(--dot-opacity) * 0.85);
+	}
+}
+
+@keyframes final-dot-field-in {
+	to {
+		opacity: var(--dot-opacity);
+	}
+}
+
+@keyframes final-line-field-in {
+	to {
+		opacity: var(--line-opacity);
+	}
+}
+
+@keyframes caterpillar-line-in {
+	to {
+		opacity: var(--line-opacity);
+	}
+}
+
+@keyframes intro-wire-in {
+	0% {
+		opacity: 0;
+		filter: blur(3px);
+	}
+	100% {
+		opacity: 0.72;
+		filter: blur(0);
 	}
 }
 
