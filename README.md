@@ -2,6 +2,19 @@
 
 [![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/vite-react-template)
 
+Prompts to ensure context continuity:
+Start a new session with:
+Use productArchitecture.md as project continuity. First inspect the current repo state before editing.
+
+Then give one task only:
+Today’s task: refine/fix [specific animation beat].
+
+Keep it updated at the end of major sessions:
+Update productArchitecture.md with durable decisions only. Remove obsolete details.
+
+Do not paste the whole old chat. Use the file plus the current task.
+
+
 This template provides a minimal setup for building a React application with TypeScript and Vite, designed to run on Cloudflare Workers. It features hot module replacement, ESLint integration, and the flexibility of Workers deployments.
 
 ![React + TypeScript + Vite + Cloudflare Workers](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/fc7b4b62-442b-4769-641b-ad4422d74300/public)

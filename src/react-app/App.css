@@ -80,6 +80,13 @@
 	animation: grid-shift 24s linear infinite;
 }
 
+.landing:not(.phase-done)::before,
+.landing:not(.phase-done)::after,
+.landing:not(.phase-done) .aura,
+.landing:not(.phase-done) .signal-grid {
+	animation-play-state: paused;
+}
+
 .emergence {
 	position: absolute;
 	inset: 0;
@@ -111,15 +118,44 @@
 	z-index: 2;
 }
 
-.intro-swarm-canvas {
+.intro-caterpillar-drawing,
+.intro-chrysalis-drawing {
 	position: absolute;
-	inset: 0;
+	top: 38%;
+	left: 36%;
 	display: block;
-	width: 100%;
-	height: 100%;
+	width: 34%;
+	height: auto;
+	mix-blend-mode: screen;
+	transition: opacity 700ms ease, filter 700ms ease;
+	user-select: none;
 }
 
-.intro-caterpillar-line,
+.intro-caterpillar-drawing {
+	filter:
+		drop-shadow(0 0 0.16rem rgba(255, 255, 255, 0.36))
+		drop-shadow(0 0 0.46rem rgba(150, 255, 246, 0.2));
+	opacity: 1;
+}
+
+.intro-chrysalis-drawing {
+	filter:
+		drop-shadow(0 0 0.16rem rgba(255, 255, 255, 0.34))
+		drop-shadow(0 0 0.44rem rgba(150, 255, 246, 0.18));
+	opacity: 0;
+	transform: translateY(10%);
+}
+
+.intro-swarm-canvas {
+	position: absolute;
+	top: var(--intro-canvas-top);
+	left: var(--intro-canvas-left);
+	display: block;
+	width: var(--intro-canvas-width);
+	height: var(--intro-canvas-height);
+	overflow: visible;
+}
+
 .intro-wire-line {
 	position: absolute;
 	left: var(--line-x);
@@ -134,25 +170,6 @@
 	opacity: 0;
 	transform: rotate(var(--line-angle));
 	transform-origin: left center;
-}
-
-.intro-caterpillar-line {
-	height: 1.25px;
-	background: linear-gradient(90deg, transparent, rgba(1, 7, 16, 0.78), rgba(7, 24, 42, 0.66), transparent);
-	box-shadow:
-		0 0 0.12rem rgba(255, 255, 255, 0.2),
-		0 0 0.32rem rgba(4, 14, 27, 0.28);
-	mix-blend-mode: multiply;
-}
-
-.intro-caterpillar-line.chrysalis-rim {
-	height: 1.6px;
-	background: linear-gradient(90deg, transparent, rgba(0, 5, 12, 0.84), rgba(4, 19, 34, 0.76), transparent);
-}
-
-.intro-caterpillar-line.caterpillar-definition {
-	height: 1.15px;
-	background: linear-gradient(90deg, transparent, rgba(1, 7, 16, 0.56), rgba(8, 30, 45, 0.46), transparent);
 }
 
 .intro-butterfly-wire .intro-wire-line {
@@ -310,9 +327,7 @@
 	font-size: clamp(4rem, 13vw, 10rem);
 	line-height: 1;
 	transform: translate(-50%, -50%);
-	transition:
-		opacity 900ms ease,
-		transform 900ms cubic-bezier(0.16, 0.84, 0.2, 1);
+	transition: opacity 950ms ease;
 }
 
 h1 {
@@ -462,7 +477,7 @@ h1 {
 .landing.phase-caterpillar .wordmark-stage,
 .landing.phase-chrysalis .wordmark-stage,
 .landing.phase-reveal .wordmark-stage {
-	transform: translate(-50%, -50%) scale(1.08);
+	transform: translate(-50%, -50%);
 }
 
 .landing.phase-swarm .butterfly-body,
@@ -537,23 +552,23 @@ h1 {
 
 .landing.phase-reveal .butterfly-line {
 	animation: final-line-field-in 700ms ease forwards;
-	animation-delay: calc(850ms + var(--reveal-order, 0) * 12ms);
+	animation-delay: calc(2920ms + var(--reveal-order, 0) * 12ms);
 }
 
-.landing.phase-caterpillar .intro-caterpillar-line.caterpillar-definition {
-	animation: caterpillar-line-in 1500ms ease forwards;
-	animation-delay: calc(var(--line-order, 0) * 42ms);
+.landing.phase-chrysalis .intro-caterpillar-drawing,
+.landing.phase-reveal .intro-caterpillar-drawing {
+	opacity: 0;
+	filter: blur(2px);
 }
 
-.landing.phase-chrysalis .intro-caterpillar-line.caterpillar-definition {
-	opacity: 0.32;
+.landing.phase-chrysalis .intro-chrysalis-drawing {
+	opacity: 1;
 }
 
-.landing.phase-chrysalis .intro-caterpillar-line.chrysalis-rim,
-.landing.phase-chrysalis .intro-caterpillar-line.chrysalis-labyrinth,
-.landing.phase-chrysalis .intro-caterpillar-line.chrysalis-antenna {
-	animation: caterpillar-line-in 1500ms ease forwards;
-	animation-delay: calc(var(--line-order, 0) * 42ms);
+.landing.phase-reveal .intro-chrysalis-drawing {
+	opacity: 1;
+	animation: chrysalis-drawing-out 700ms ease forwards;
+	animation-delay: 2900ms;
 }
 
 .landing.phase-reveal .intro-butterfly-wire .intro-wire-line {
@@ -616,9 +631,10 @@ h1 {
 	}
 }
 
-@keyframes caterpillar-line-in {
+@keyframes chrysalis-drawing-out {
 	to {
-		opacity: var(--line-opacity);
+		opacity: 0;
+		filter: blur(2px);
 	}
 }
 

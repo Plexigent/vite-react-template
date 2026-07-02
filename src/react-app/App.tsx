@@ -7,6 +7,8 @@ import {
 	type CSSProperties,
 } from "react";
 import { flushSync } from "react-dom";
+import caterpillarLineArt from "./assets/caterpillar-line-art.png";
+import chrysalisLineArt from "./assets/chrysalis-line-art.png";
 import "./App.css";
 
 type Dot = {
@@ -45,6 +47,13 @@ type IntroSwarmDot = {
 	startY: number;
 };
 
+type IntroCanvasBounds = {
+	height: number;
+	left: number;
+	top: number;
+	width: number;
+};
+
 type RevealWord = {
 	baseStart: number;
 	length: number;
@@ -58,11 +67,15 @@ const REVEAL_FADE_DURATION = 1000;
 const REVEAL_HOLD_DURATION = 1000;
 const INTRO_PHASES: Array<{ duration: number; phase: IntroPhase }> = [
 	{ duration: 5600, phase: "caterpillar" },
-	{ duration: 2600, phase: "chrysalis" },
-	{ duration: 3600, phase: "reveal" },
-	{ duration: 3200, phase: "done" },
+	{ duration: 1300, phase: "chrysalis" },
+	{ duration: 2550, phase: "reveal" },
+	{ duration: 4400, phase: "done" },
 ];
 const INTRO_SWARM_DOT_COUNT = 192;
+const INTRO_CANVAS_BOUNDS: Record<"swarm" | "reveal", IntroCanvasBounds> = {
+	swarm: { height: 76, left: -8, top: 32, width: 84 },
+	reveal: { height: 58, left: 38, top: 8, width: 55 },
+};
 
 function sleep(duration: number) {
 	return new Promise((resolve) => {
@@ -190,12 +203,27 @@ function seededUnit(index: number, salt: number) {
 	return value - Math.floor(value);
 }
 
+function createSwarmStartPoint(index: number) {
+	const angle = seededUnit(index, 10) * Math.PI * 2;
+	const radius = Math.sqrt(seededUnit(index, 11));
+	const edgeBias = seededUnit(index, 12) > 0.72 ? 1.18 : 1;
+	const raggedness = 0.82 + seededUnit(index, 13) * 0.46;
+	const spillX = seededUnit(index, 14) > 0.8 ? -5.5 * seededUnit(index, 15) : 0;
+	const spillY = seededUnit(index, 16) > 0.76 ? 5.8 * seededUnit(index, 17) : 0;
+
+	return {
+		startX: 18 + Math.cos(angle) * 32 * radius * edgeBias * raggedness + spillX,
+		startY: 82 + Math.sin(angle) * 24 * radius * edgeBias * raggedness + spillY,
+	};
+}
+
 function createIntroSwarmDots(): IntroSwarmDot[] {
 	return Array.from({ length: INTRO_SWARM_DOT_COUNT }, (_, index) => {
 		const angle = index * 2.39996323;
 		const bodyCount = 164;
 		const legStart = bodyCount;
 		const antennaStart = 184;
+		const startPoint = createSwarmStartPoint(index);
 		let endX = 42;
 		let endY = 52;
 
@@ -229,8 +257,8 @@ function createIntroSwarmDots(): IntroSwarmDot[] {
 			index,
 			phase: seededUnit(index, 8) * Math.PI * 2,
 			radius: 2.65 + seededUnit(index, 9) * 2.1,
-			startX: 1 + seededUnit(index, 10) * 36,
-			startY: 58 + seededUnit(index, 11) * 41,
+			startX: startPoint.startX,
+			startY: startPoint.startY,
 		};
 	});
 }
@@ -239,27 +267,6 @@ const introSwarmDots = createIntroSwarmDots();
 const butterflyTransferDots = butterflyDots.map(
 	(_, index) => introSwarmDots[Math.floor(index * (164 / butterflyDots.length))],
 );
-
-const introCaterpillarLines: Line[] = [
-	...polyline([[44.7, 53], [47.3, 51.2], [50.2, 49.9], [53.5, 49.6], [56.8, 50.4], [59.6, 52.1], [61.4, 53.1], [63, 50.2], [64.4, 48.5]], "intro-caterpillar-line caterpillar-definition", 0.58),
-	...polyline([[45, 53.8], [48.3, 54.1], [52, 53.5], [55.8, 53.9], [59.4, 54], [61.7, 52.7], [63.5, 49.8], [64.8, 48.8]], "intro-caterpillar-line caterpillar-definition", 0.52),
-	...polyline([[46.5, 52.7], [48.5, 50.4], [50.5, 53.4], [53.1, 50.2], [55.5, 53.5], [58.3, 51.7], [60.4, 53.2]], "intro-caterpillar-line caterpillar-definition", 0.5),
-	...polyline([[47.5, 53.8], [49.6, 50.2], [52, 53.4], [54.3, 50.2], [56.8, 53.6], [59.2, 52], [61.5, 50.4]], "intro-caterpillar-line caterpillar-definition", 0.46),
-	...polyline([[62.8, 48.4], [63.7, 46.5], [64.8, 45.1]], "intro-caterpillar-line caterpillar-definition", 0.38),
-	...polyline([[63.5, 48.4], [64.5, 46], [65.7, 44.4]], "intro-caterpillar-line caterpillar-definition", 0.34),
-];
-
-const introChrysalisLines: Line[] = [
-	...polyline([[42.6, 53.3], [45.8, 50.1], [49.8, 47.5], [54.3, 46.9], [58.8, 48.3], [62.5, 51.5], [64.6, 54.1], [66.1, 50.4], [67.5, 46.7]], "intro-caterpillar-line chrysalis-rim", 0.56),
-	...polyline([[42.9, 55.2], [47.6, 56.1], [52.3, 55.2], [57, 55.8], [61.5, 56.1], [64.2, 53.5], [66.2, 49.7], [67.7, 48.4]], "intro-caterpillar-line chrysalis-rim", 0.52),
-	...polyline([[45.2, 53.4], [48.2, 48.8], [50.7, 55], [54, 48.4], [56.8, 55.1], [60.3, 51.5], [62.8, 55.1], [66.2, 49.1]], "intro-caterpillar-line chrysalis-labyrinth", 0.58),
-	...polyline([[46.2, 55.1], [49.7, 48.1], [52.3, 54.9], [55, 48.2], [58.3, 55.2], [61.1, 51.7], [64, 48.9], [67, 47.7]], "intro-caterpillar-line chrysalis-labyrinth", 0.54),
-	...polyline([[45.6, 50.9], [48.1, 55.7], [51.1, 48.7], [53.3, 55.3], [56, 48.8], [59, 55.5], [61.7, 52.1]], "intro-caterpillar-line chrysalis-labyrinth", 0.52),
-	...polyline([[49, 51.3], [52.1, 47.7], [54.3, 55.3], [57, 48.5], [59.8, 55.2], [62.3, 52.2], [66.1, 48]], "intro-caterpillar-line chrysalis-labyrinth", 0.56),
-	...polyline([[44.8, 52.2], [48.6, 53.2], [51.5, 49.7], [54.6, 53.5], [57.5, 49.7], [60.4, 53.4], [63.3, 50.8], [66.3, 48.9]], "intro-caterpillar-line chrysalis-labyrinth", 0.52),
-	...polyline([[64, 46.8], [65.2, 44.5], [66.7, 42.6]], "intro-caterpillar-line chrysalis-antenna", 0.38),
-	...polyline([[65, 46.8], [66.2, 43.9], [67.7, 41.7]], "intro-caterpillar-line chrysalis-antenna", 0.34),
-];
 
 const meshLineIndexes = [
 	[0, 1],
@@ -501,13 +508,13 @@ function useOverlayOffset(revealWord: RevealWord | undefined) {
 	return { letterRefs, offset, wordmarkRef };
 }
 
-function useMotionTime() {
+function useMotionTime(introPhase: IntroPhase) {
 	const [time, setTime] = useState(0);
 
 	useEffect(() => {
 		const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
 
-		if (reducedMotion.matches) {
+		if (reducedMotion.matches || introPhase !== "done") {
 			return undefined;
 		}
 
@@ -526,7 +533,7 @@ function useMotionTime() {
 		animationFrame = requestAnimationFrame(animate);
 
 		return () => cancelAnimationFrame(animationFrame);
-	}, []);
+	}, [introPhase]);
 
 	return time;
 }
@@ -585,10 +592,40 @@ function getCurvedSwarmPosition(dot: IntroSwarmDot, progress: number) {
 	};
 }
 
-function createChrysalisCanvasPath(context: CanvasRenderingContext2D, width: number, height: number) {
+function getIntroCanvasBounds(phase: IntroPhase): IntroCanvasBounds {
+	return phase === "reveal" ? INTRO_CANVAS_BOUNDS.reveal : INTRO_CANVAS_BOUNDS.swarm;
+}
+
+function introCanvasBoundsStyle(bounds: IntroCanvasBounds): CSSProperties {
+	return {
+		"--intro-canvas-height": `${bounds.height}%`,
+		"--intro-canvas-left": `${bounds.left}%`,
+		"--intro-canvas-top": `${bounds.top}%`,
+		"--intro-canvas-width": `${bounds.width}%`,
+	} as CSSProperties;
+}
+
+function toCanvasPoint(
+	x: number,
+	y: number,
+	width: number,
+	height: number,
+	bounds: IntroCanvasBounds,
+) {
+	return {
+		x: ((x - bounds.left) / bounds.width) * width,
+		y: ((y - bounds.top) / bounds.height) * height,
+	};
+}
+
+function createChrysalisCanvasPath(
+	context: CanvasRenderingContext2D,
+	width: number,
+	height: number,
+	bounds: IntroCanvasBounds,
+) {
 	const point = (x: number, y: number) => ({
-		x: (x / 100) * width,
-		y: (y / 100) * height,
+		...toCanvasPoint(x, y, width, height, bounds),
 	});
 	const start = point(42.5, 54);
 
@@ -616,10 +653,12 @@ function createChrysalisCanvasPath(context: CanvasRenderingContext2D, width: num
 function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const introPhaseRef = useRef(introPhase);
+	const canvasBoundsRef = useRef(getIntroCanvasBounds(introPhase));
 	const phaseStartedAtRef = useRef(0);
 
 	useEffect(() => {
 		introPhaseRef.current = introPhase;
+		canvasBoundsRef.current = getIntroCanvasBounds(introPhase);
 		phaseStartedAtRef.current = performance.now();
 	}, [introPhase]);
 
@@ -637,10 +676,13 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 		let pixelRatio = 1;
 		let startTime = 0;
 		phaseStartedAtRef.current = performance.now();
+		const userAgent = window.navigator.userAgent;
+		const isSafari = /^((?!chrome|android).)*safari/i.test(userAgent);
+		const isDesktopSafari = isSafari && /Macintosh/i.test(userAgent);
 
 		const resize = () => {
 			const bounds = canvas.getBoundingClientRect();
-			pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+			pixelRatio = Math.min(window.devicePixelRatio || 1, isDesktopSafari ? 1.25 : 2);
 			width = bounds.width;
 			height = bounds.height;
 			canvas.width = Math.floor(width * pixelRatio);
@@ -689,10 +731,13 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 			revealProgress: number,
 		) => {
 			const easedT = easeInOutCubic(revealProgress);
-			const startX = (source.endX / 100) * width;
-			const startY = (source.endY / 100) * height;
-			const endX = (target.x / 100) * width;
-			const endY = (target.y / 100) * height;
+			const bounds = canvasBoundsRef.current;
+			const start = toCanvasPoint(source.endX, source.endY, width, height, bounds);
+			const end = toCanvasPoint(target.x, target.y, width, height, bounds);
+			const startX = start.x;
+			const startY = start.y;
+			const endX = end.x;
+			const endY = end.y;
 			const dx = endX - startX;
 			const dy = endY - startY;
 			const length = Math.hypot(dx, dy) || 1;
@@ -730,6 +775,7 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 			context.clearRect(0, 0, width, height);
 			context.globalCompositeOperation = "lighter";
 			const phase = introPhaseRef.current;
+			const canvasBounds = canvasBoundsRef.current;
 			const isRevealPhase = phase === "reveal";
 			const isChrysalisPhase = phase === "chrysalis";
 			const chrysalisProgress = isChrysalisPhase
@@ -755,8 +801,9 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 					progress >= 1
 						? { x: dot.endX, y: dot.endY, offsetX: 0, offsetY: 0 }
 						: getCurvedSwarmPosition(dot, progress);
-				const x = (position.x / 100) * width + position.offsetX;
-				const y = (position.y / 100) * height + position.offsetY;
+				const point = toCanvasPoint(position.x, position.y, width, height, canvasBounds);
+				const x = point.x + position.offsetX;
+				const y = point.y + position.offsetY;
 
 				if (progress > 0) {
 					drawDot(dot, x, y, progress, 0);
@@ -765,7 +812,7 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 
 			if (chrysalisProgress > 0) {
 				context.save();
-				createChrysalisCanvasPath(context, width, height);
+				createChrysalisCanvasPath(context, width, height, canvasBounds);
 				context.clip();
 
 				for (const dot of introSwarmDots) {
@@ -775,8 +822,9 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 						progress >= 1
 							? { x: dot.endX, y: dot.endY, offsetX: 0, offsetY: 0 }
 							: getCurvedSwarmPosition(dot, progress);
-					const x = (position.x / 100) * width + position.offsetX;
-					const y = (position.y / 100) * height + position.offsetY;
+					const point = toCanvasPoint(position.x, position.y, width, height, canvasBounds);
+					const x = point.x + position.offsetX;
+					const y = point.y + position.offsetY;
 
 					if (progress > 0) {
 						drawDot(dot, x, y, progress, chrysalisProgress, 1 - dissolveProgress);
@@ -792,38 +840,56 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 				}
 			}
 
-			context.globalCompositeOperation = "source-over";
-
-			if (chrysalisProgress > 0) {
-				context.save();
-				createChrysalisCanvasPath(context, width, height);
-				context.lineWidth = Math.max(1.1, Math.min(width, height) * 0.002);
-				context.strokeStyle = `rgba(7, 16, 24, ${(0.22 + chrysalisProgress * 0.38) * (1 - dissolveProgress)})`;
-				context.shadowColor = `rgba(255, 255, 255, ${0.14 * chrysalisProgress * (1 - dissolveProgress)})`;
-				context.shadowBlur = 5 * chrysalisProgress;
-				context.stroke();
-				context.restore();
-			}
-
 			animationFrame = window.requestAnimationFrame(render);
 		};
 
 		resize();
+		const resizeObserver = new ResizeObserver(resize);
+		resizeObserver.observe(canvas);
 		window.addEventListener("resize", resize);
 		animationFrame = window.requestAnimationFrame(render);
 
 		return () => {
 			window.cancelAnimationFrame(animationFrame);
+			resizeObserver.disconnect();
 			window.removeEventListener("resize", resize);
 		};
 	}, []);
 
-	return <canvas className="intro-swarm-canvas" ref={canvasRef} />;
+	return (
+		<canvas
+			className="intro-swarm-canvas"
+			ref={canvasRef}
+			style={introCanvasBoundsStyle(getIntroCanvasBounds(introPhase))}
+		/>
+	);
+}
+
+function IntroCaterpillarDrawing() {
+	return (
+		<img
+			alt=""
+			className="intro-caterpillar-drawing"
+			aria-hidden="true"
+			src={caterpillarLineArt}
+		/>
+	);
+}
+
+function IntroChrysalisDrawing() {
+	return (
+		<img
+			alt=""
+			className="intro-chrysalis-drawing"
+			aria-hidden="true"
+			src={chrysalisLineArt}
+		/>
+	);
 }
 
 function App() {
-	const time = useMotionTime();
 	const introPhase = useIntroPhase();
+	const time = useMotionTime(introPhase);
 	const revealWords = useMemo(
 		() => REVEAL_WORDS.map((word) => getRevealWord(word)),
 		[],
@@ -915,30 +981,8 @@ function App() {
 						<IntroSwarmCanvas introPhase={introPhase} />
 					</div>
 					<div className="intro-caterpillar">
-						{introCaterpillarLines.map((line, index) => (
-							<span
-								key={`intro-caterpillar-line-${index}`}
-								className={line.className}
-								style={
-									{
-										...lineStyle(line),
-										"--line-order": index,
-									} as CSSProperties
-								}
-							/>
-						))}
-						{introChrysalisLines.map((line, index) => (
-							<span
-								key={`intro-chrysalis-line-${index}`}
-								className={line.className}
-								style={
-									{
-										...lineStyle(line),
-										"--line-order": index,
-									} as CSSProperties
-								}
-							/>
-						))}
+						<IntroCaterpillarDrawing />
+						<IntroChrysalisDrawing />
 					</div>
 					<div className="intro-butterfly-wire">
 						{butterflyDetailLines.map((line, index) => (
