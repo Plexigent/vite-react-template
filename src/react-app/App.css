@@ -1,6 +1,6 @@
 #root {
-	height: 100vh;
-	min-height: 100vh;
+	height: 100%;
+	min-height: 100%;
 	overflow: hidden;
 	text-align: center;
 }
@@ -9,13 +9,32 @@
 	position: relative;
 	display: grid;
 	height: 100vh;
-	min-height: 100vh;
+	height: 100dvh;
+	min-height: 100svh;
 	place-items: center;
 	overflow: hidden;
 	background:
 		radial-gradient(circle at 50% 42%, rgba(237, 252, 255, 0.18), transparent 11rem),
 		linear-gradient(135deg, #071014 0%, #121826 43%, #05080d 100%);
 	isolation: isolate;
+}
+
+.scene-safe-area {
+	position: absolute;
+	inset:
+		env(safe-area-inset-top, 0px)
+		env(safe-area-inset-right, 0px)
+		env(safe-area-inset-bottom, 0px)
+		env(safe-area-inset-left, 0px);
+	display: grid;
+	place-items: center;
+}
+
+.scene-stage {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	overflow: visible;
 }
 
 .landing::before,
@@ -320,9 +339,9 @@
 }
 
 .wordmark-stage {
-	position: fixed;
-	top: 50vh;
-	left: 50vw;
+	position: absolute;
+	top: 50%;
+	left: 50%;
 	z-index: 1;
 	font-size: clamp(4rem, 13vw, 10rem);
 	line-height: 1;
@@ -731,30 +750,41 @@ h1 {
 	}
 }
 
+.scene-stage.scene-portrait {
+	width: min(100%, 46.21dvh);
+	height: min(100%, 216.41vw);
+	aspect-ratio: 390 / 844;
+}
+
+.scene-portrait .intro-caterpillar-drawing,
+.scene-portrait .intro-chrysalis-drawing {
+	top: 39%;
+	left: 7%;
+	width: 86%;
+}
+
+.scene-portrait h1 {
+	max-width: calc(100% - 2rem);
+	padding: 0;
+}
+
+.scene-portrait .wordmark-stage {
+	font-size: clamp(1.9rem, 9.25vw, 2.28rem);
+}
+
 @media (max-width: 720px) {
+
 	.signal-grid {
 		background-size: 3rem 3rem;
 		opacity: 0.26;
-	}
-
-	.emergence {
-		transform: rotate(-4deg);
 	}
 
 	.dot {
 		width: clamp(calc(var(--size) * 0.66), 1.45vw, calc(var(--size) * 1.04));
 	}
 
-	.mesh-lines span {
-		width: calc(var(--line-width) * 1.32);
-	}
-
 	h1 {
 		font-size: 1em;
-	}
-
-	.wordmark-stage {
-		font-size: clamp(3.7rem, 18vw, 5.8rem);
 	}
 }
 

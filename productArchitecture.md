@@ -19,6 +19,8 @@
 
 **Scene Model:**
 - One full-screen landing page with centered `Plexigent` wordmark.
+- Foreground artwork renders inside a measured scene stage: full-viewport landscape on wide screens and a contained 390:844 portrait stage on phones/portrait displays.
+- Landscape and portrait use the same primitives and animation pipeline with layout-specific coordinate transforms.
 - Intro phase sequence: `swarm -> caterpillar -> chrysalis -> reveal -> done`.
 - Canvas intro renders swarm dots, caterpillar fill, chrysalis dissolve, and 23-dot transfer into butterfly positions.
 - Persistent final scene renders 31 lower-left dots, 29 middle mesh dots, and 23 butterfly dots plus linework.
@@ -30,6 +32,8 @@
 - Desktop Safari canvas DPR is capped lower than other browsers.
 - `useMotionTime()` is paused until `phase-done` to avoid hidden React animation work during intro.
 - Ambient background animations pause during intro and resume after `phase-done`.
+- Line angles and lengths are calculated from the measured scene-stage aspect ratio rather than a fixed viewport assumption.
+- Portrait intro dots are centered on the enlarged caterpillar/chrysalis artwork, and the portrait transfer temporarily uses a full-stage canvas to prevent edge clipping.
 
 ## 3. Current State & Key Info
 
@@ -42,6 +46,8 @@
 - `Plexigent` swells/fades in after the visual reveal.
 - Spherical `?` button appears after a slight pause.
 - Button cycles word associations: `ComPlex`, `Intelligent`, `exigent`, `Plexippus`.
+- iOS/phone-safe portrait composition with aligned intro/final graphics and reveal words constrained to the visible stage.
+- Dynamic viewport units, safe-area insets, and `viewport-fit=cover` support for mobile browser chrome and device cutouts.
 
 **Important Quirks:**
 - Keep page phase classes as `phase-*`; do not rename them to `intro-*` because that previously collided with intro layer classes.

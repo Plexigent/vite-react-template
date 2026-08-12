@@ -5,6 +5,7 @@ import {
 	useRef,
 	useState,
 	type CSSProperties,
+	type RefObject,
 } from "react";
 import { flushSync } from "react-dom";
 import caterpillarLineArt from "./assets/caterpillar-line-art.png";
@@ -32,6 +33,7 @@ type Line = {
 
 type DotGroup = "star" | "mesh" | "butterfly";
 type IntroPhase = "swarm" | "caterpillar" | "chrysalis" | "reveal" | "done";
+type SceneLayout = "landscape" | "portrait";
 
 type IntroSwarmDot = {
 	amplitude: number;
@@ -75,6 +77,10 @@ const INTRO_SWARM_DOT_COUNT = 192;
 const INTRO_CANVAS_BOUNDS: Record<"swarm" | "reveal", IntroCanvasBounds> = {
 	swarm: { height: 76, left: -8, top: 32, width: 84 },
 	reveal: { height: 58, left: 38, top: 8, width: 55 },
+};
+const PORTRAIT_INTRO_CANVAS_BOUNDS: Record<"swarm" | "reveal", IntroCanvasBounds> = {
+	swarm: { height: 58, left: -42, top: 31, width: 146 },
+	reveal: { height: 100, left: 0, top: 0, width: 100 },
 };
 
 function sleep(duration: number) {
@@ -382,6 +388,36 @@ function lineBetween(from: Dot, to: Dot): Pick<Line, "x" | "y" | "x2" | "y2"> {
 	};
 }
 
+function portraitPoint(x: number, y: number, group: DotGroup) {
+	if (group === "star") {
+		return { x: 7 + x * 0.82, y: 69 + (y - 58) * 0.66 };
+	}
+
+	if (group === "mesh") {
+		return { x: 18 + (x - 39) * 1.24, y: 72 + (y - 67) * 0.88 };
+	}
+
+	return { x: 64 + (x - 68.4) * 1.24, y: 11 + (y - 11.6) * 0.94 };
+}
+
+function layoutDot(dot: Dot, group: DotGroup, layout: SceneLayout): Dot {
+	if (layout === "landscape") {
+		return dot;
+	}
+
+	return { ...dot, ...portraitPoint(dot.x, dot.y, group) };
+}
+
+function layoutLine(line: Line, group: DotGroup, layout: SceneLayout): Line {
+	if (layout === "landscape") {
+		return line;
+	}
+
+	const start = portraitPoint(line.x, line.y, group);
+	const end = portraitPoint(line.x2, line.y2, group);
+	return { ...line, x: start.x, y: start.y, x2: end.x, y2: end.y };
+}
+
 function dotStyle(dot: Dot): CSSProperties {
 	return {
 		"--x": `${dot.x}%`,
@@ -408,19 +444,56 @@ function getLeftToRightOrder(dots: Dot[]) {
 		}, {});
 }
 
-function lineStyle(line: Line): CSSProperties {
-	const yScale = 0.5625;
+function lineStyle(line: Line, sceneAspect: number): CSSProperties {
+	const yScale = sceneAspect;
 	const dx = line.x2 - line.x;
 	const dy = (line.y2 - line.y) * yScale;
 
 	return {
 		"--line-x": `${line.x}%`,
 		"--line-y": `${line.y}%`,
-		"--line-width": `${Math.hypot(dx, dy)}vw`,
+		"--line-width": `${Math.hypot(dx, dy)}%`,
 		"--line-angle": `${Math.atan2(dy, dx) * (180 / Math.PI)}deg`,
 		"--line-opacity": line.opacity ?? 0.5,
 		"--delay": `${line.delay ?? 0}s`,
 	} as CSSProperties;
+}
+
+function useSceneLayout() {
+	const [layout, setLayout] = useState<SceneLayout>(() =>
+		window.matchMedia("(max-width: 720px), (orientation: portrait)").matches
+			? "portrait"
+			: "landscape",
+	);
+
+	useEffect(() => {
+		const media = window.matchMedia("(max-width: 720px), (orientation: portrait)");
+		const update = () => setLayout(media.matches ? "portrait" : "landscape");
+		media.addEventListener("change", update);
+		return () => media.removeEventListener("change", update);
+	}, []);
+
+	return layout;
+}
+
+function useSceneAspect(sceneRef: RefObject<HTMLDivElement | null>) {
+	const [aspect, setAspect] = useState(9 / 16);
+
+	useLayoutEffect(() => {
+		const scene = sceneRef.current;
+		if (!scene) return undefined;
+
+		const update = () => {
+			const bounds = scene.getBoundingClientRect();
+			if (bounds.width > 0) setAspect(bounds.height / bounds.width);
+		};
+		update();
+		const observer = new ResizeObserver(update);
+		observer.observe(scene);
+		return () => observer.disconnect();
+	}, [sceneRef]);
+
+	return aspect;
 }
 
 function getRevealWord(text: string): RevealWord {
@@ -592,8 +665,15 @@ function getCurvedSwarmPosition(dot: IntroSwarmDot, progress: number) {
 	};
 }
 
-function getIntroCanvasBounds(phase: IntroPhase): IntroCanvasBounds {
-	return phase === "reveal" ? INTRO_CANVAS_BOUNDS.reveal : INTRO_CANVAS_BOUNDS.swarm;
+function getIntroCanvasBounds(phase: IntroPhase, layout: SceneLayout): IntroCanvasBounds {
+	const bounds = layout === "portrait" ? PORTRAIT_INTRO_CANVAS_BOUNDS : INTRO_CANVAS_BOUNDS;
+	return phase === "reveal" ? bounds.reveal : bounds.swarm;
+}
+
+function introLayoutPoint(x: number, y: number, layout: SceneLayout) {
+	return layout === "portrait"
+		? { x: 20 + (x - 42) * 2.25, y: y - 5.5 }
+		: { x, y };
 }
 
 function introCanvasBoundsStyle(bounds: IntroCanvasBounds): CSSProperties {
@@ -623,10 +703,12 @@ function createChrysalisCanvasPath(
 	width: number,
 	height: number,
 	bounds: IntroCanvasBounds,
+	layout: SceneLayout,
 ) {
-	const point = (x: number, y: number) => ({
-		...toCanvasPoint(x, y, width, height, bounds),
-	});
+	const point = (x: number, y: number) => {
+		const scenePoint = introLayoutPoint(x, y, layout);
+		return toCanvasPoint(scenePoint.x, scenePoint.y, width, height, bounds);
+	};
 	const start = point(42.5, 54);
 
 	context.beginPath();
@@ -650,17 +732,19 @@ function createChrysalisCanvasPath(
 	context.closePath();
 }
 
-function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
+function IntroSwarmCanvas({ introPhase, layout }: { introPhase: IntroPhase; layout: SceneLayout }) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
 	const introPhaseRef = useRef(introPhase);
-	const canvasBoundsRef = useRef(getIntroCanvasBounds(introPhase));
+	const layoutRef = useRef(layout);
+	const canvasBoundsRef = useRef(getIntroCanvasBounds(introPhase, layout));
 	const phaseStartedAtRef = useRef(0);
 
 	useEffect(() => {
 		introPhaseRef.current = introPhase;
-		canvasBoundsRef.current = getIntroCanvasBounds(introPhase);
+		layoutRef.current = layout;
+		canvasBoundsRef.current = getIntroCanvasBounds(introPhase, layout);
 		phaseStartedAtRef.current = performance.now();
-	}, [introPhase]);
+	}, [introPhase, layout]);
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
@@ -732,8 +816,10 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 		) => {
 			const easedT = easeInOutCubic(revealProgress);
 			const bounds = canvasBoundsRef.current;
-			const start = toCanvasPoint(source.endX, source.endY, width, height, bounds);
-			const end = toCanvasPoint(target.x, target.y, width, height, bounds);
+			const sourcePoint = introLayoutPoint(source.endX, source.endY, layoutRef.current);
+			const targetPoint = layoutDot(target, "butterfly", layoutRef.current);
+			const start = toCanvasPoint(sourcePoint.x, sourcePoint.y, width, height, bounds);
+			const end = toCanvasPoint(targetPoint.x, targetPoint.y, width, height, bounds);
 			const startX = start.x;
 			const startY = start.y;
 			const endX = end.x;
@@ -801,7 +887,8 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 					progress >= 1
 						? { x: dot.endX, y: dot.endY, offsetX: 0, offsetY: 0 }
 						: getCurvedSwarmPosition(dot, progress);
-				const point = toCanvasPoint(position.x, position.y, width, height, canvasBounds);
+				const scenePoint = introLayoutPoint(position.x, position.y, layoutRef.current);
+				const point = toCanvasPoint(scenePoint.x, scenePoint.y, width, height, canvasBounds);
 				const x = point.x + position.offsetX;
 				const y = point.y + position.offsetY;
 
@@ -812,7 +899,13 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 
 			if (chrysalisProgress > 0) {
 				context.save();
-				createChrysalisCanvasPath(context, width, height, canvasBounds);
+				createChrysalisCanvasPath(
+					context,
+					width,
+					height,
+					canvasBounds,
+					layoutRef.current,
+				);
 				context.clip();
 
 				for (const dot of introSwarmDots) {
@@ -822,7 +915,8 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 						progress >= 1
 							? { x: dot.endX, y: dot.endY, offsetX: 0, offsetY: 0 }
 							: getCurvedSwarmPosition(dot, progress);
-					const point = toCanvasPoint(position.x, position.y, width, height, canvasBounds);
+					const scenePoint = introLayoutPoint(position.x, position.y, layoutRef.current);
+					const point = toCanvasPoint(scenePoint.x, scenePoint.y, width, height, canvasBounds);
 					const x = point.x + position.offsetX;
 					const y = point.y + position.offsetY;
 
@@ -860,7 +954,7 @@ function IntroSwarmCanvas({ introPhase }: { introPhase: IntroPhase }) {
 		<canvas
 			className="intro-swarm-canvas"
 			ref={canvasRef}
-			style={introCanvasBoundsStyle(getIntroCanvasBounds(introPhase))}
+			style={introCanvasBoundsStyle(getIntroCanvasBounds(introPhase, layout))}
 		/>
 	);
 }
@@ -890,6 +984,9 @@ function IntroChrysalisDrawing() {
 function App() {
 	const introPhase = useIntroPhase();
 	const time = useMotionTime(introPhase);
+	const layout = useSceneLayout();
+	const sceneRef = useRef<HTMLDivElement>(null);
+	const sceneAspect = useSceneAspect(sceneRef);
 	const revealWords = useMemo(
 		() => REVEAL_WORDS.map((word) => getRevealWord(word)),
 		[],
@@ -904,17 +1001,29 @@ function App() {
 	const activeReveal =
 		activeRevealIndex === null ? undefined : revealWords[activeRevealIndex];
 	const { letterRefs, offset, wordmarkRef } = useOverlayOffset(activeReveal);
+	const layoutStars = useMemo(
+		() => starDots.map((dot) => layoutDot(dot, "star", layout)),
+		[layout],
+	);
+	const layoutMeshDots = useMemo(
+		() => meshDots.map((dot) => layoutDot(dot, "mesh", layout)),
+		[layout],
+	);
+	const layoutButterflyDots = useMemo(
+		() => butterflyDots.map((dot) => layoutDot(dot, "butterfly", layout)),
+		[layout],
+	);
 	const movingStars = useMemo(
-		() => starDots.map((dot, index) => orbitDot(dot, index, "star", time)),
-		[time],
+		() => layoutStars.map((dot, index) => orbitDot(dot, index, "star", time)),
+		[layoutStars, time],
 	);
 	const movingMeshDots = useMemo(
-		() => meshDots.map((dot, index) => orbitDot(dot, index, "mesh", time)),
-		[time],
+		() => layoutMeshDots.map((dot, index) => orbitDot(dot, index, "mesh", time)),
+		[layoutMeshDots, time],
 	);
 	const movingButterflyDots = useMemo(
-		() => butterflyDots.map((dot, index) => orbitDot(dot, index, "butterfly", time)),
-		[time],
+		() => layoutButterflyDots.map((dot, index) => orbitDot(dot, index, "butterfly", time)),
+		[layoutButterflyDots, time],
 	);
 	const movingMeshLines = useMemo(
 		() =>
@@ -934,9 +1043,11 @@ function App() {
 				delay: -((index % 16) + 1),
 				className: `butterfly-line ${index < 21 ? "foreground-line" : "background-line"}`,
 			})),
-			...butterflyDetailLines.map((line, index) => flexFreeLine(line, index, time)),
+			...butterflyDetailLines.map((line, index) =>
+				flexFreeLine(layoutLine(line, "butterfly", layout), index, time),
+			),
 		],
-		[movingButterflyDots, time],
+		[layout, movingButterflyDots, time],
 	);
 	const startRevealSequence = async () => {
 		if (isSequenceRunning) {
@@ -975,28 +1086,33 @@ function App() {
 			<div className="aura aura-one" />
 			<div className="aura aura-two" />
 			<div className="signal-grid" />
+			<div className="scene-safe-area">
+			<div className={`scene-stage scene-${layout}`} ref={sceneRef}>
 			{introPhase !== "done" ? (
 				<div className="intro-theater" aria-hidden="true">
 					<div className="intro-swarm">
-						<IntroSwarmCanvas introPhase={introPhase} />
+						<IntroSwarmCanvas introPhase={introPhase} layout={layout} />
 					</div>
 					<div className="intro-caterpillar">
 						<IntroCaterpillarDrawing />
 						<IntroChrysalisDrawing />
 					</div>
 					<div className="intro-butterfly-wire">
-						{butterflyDetailLines.map((line, index) => (
+						{butterflyDetailLines.map((sourceLine, index) => {
+							const line = layoutLine(sourceLine, "butterfly", layout);
+							return (
 							<span
 								key={`intro-butterfly-wire-${index}`}
 								className="intro-wire-line"
 								style={
 									{
-										...lineStyle(line),
+										...lineStyle(line, sceneAspect),
 										"--line-order": index,
 									} as CSSProperties
 								}
 							/>
-						))}
+							);
+						})}
 					</div>
 				</div>
 			) : null}
@@ -1007,7 +1123,7 @@ function App() {
 							key={`mesh-line-${index}`}
 							className={line.className}
 							style={{
-								...lineStyle(line),
+								...lineStyle(line, sceneAspect),
 								...revealOrderStyle(index),
 							}}
 						/>
@@ -1017,7 +1133,7 @@ function App() {
 							key={`butterfly-line-${index}`}
 							className={line.className}
 							style={{
-								...lineStyle(line),
+								...lineStyle(line, sceneAspect),
 								...revealOrderStyle(index),
 							}}
 						/>
@@ -1114,6 +1230,8 @@ function App() {
 				>
 					<span aria-hidden="true">?</span>
 				</button>
+			</div>
+			</div>
 			</div>
 		</main>
 	);
