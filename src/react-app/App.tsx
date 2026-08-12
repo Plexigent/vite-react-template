@@ -64,7 +64,7 @@ type RevealWord = {
 };
 
 const WORDMARK = "Plexigent";
-const REVEAL_WORDS = ["ComPlex", "Intelligent", "exigent", "Plexippus"];
+const REVEAL_WORDS = ["ComPlex", "exigent", "Intelligent", "Plexippus"];
 const REVEAL_FADE_DURATION = 1000;
 const REVEAL_HOLD_DURATION = 1000;
 const INTRO_PHASES: Array<{ duration: number; phase: IntroPhase }> = [

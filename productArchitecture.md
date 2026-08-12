@@ -45,7 +45,7 @@
 - Final lower-left/middle/butterfly dot systems reveal only late in the sequence.
 - `Plexigent` swells/fades in after the visual reveal.
 - Spherical `?` button appears after a slight pause.
-- Button cycles word associations: `ComPlex`, `Intelligent`, `exigent`, `Plexippus`.
+- Button cycles word associations in a cinematic progression: `ComPlex`, `exigent`, `Intelligent`, `Plexippus`.
 - iOS/phone-safe portrait composition with aligned intro/final graphics and reveal words constrained to the visible stage.
 - Dynamic viewport units, safe-area insets, and `viewport-fit=cover` support for mobile browser chrome and device cutouts.
 
