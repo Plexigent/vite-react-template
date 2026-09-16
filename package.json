@@ -40,6 +40,7 @@
 		"deploy": "wrangler deploy",
 		"dev": "vite",
 		"lint": "eslint .",
+		"test:scene": "node --test scripts/scene.test.mjs",
 		"preview": "npm run build && vite preview"
 	},
 	"type": "module"
