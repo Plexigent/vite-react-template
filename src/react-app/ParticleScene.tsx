@@ -6,10 +6,13 @@ import {
 	butterflyDetailLines, type Point,
 } from "./sceneGeometry.ts";
 import {
-	TIMING, PARTICLE_COUNT, arrivalTime, artworkRect, butterflyPoint, canvasRatio,
-	fitScene, flightPoint, formationPoint, mix, particleRadius, phaseAt, progress,
-	random, scenePoint, smooth, transferSources, transferTargets, type Phase, type SceneSize,
+	TIMING, PARTICLE_COUNT, SEED_ALPHA, arrivalTime, artworkRect, butterflyPoint, canvasRatio,
+	chrysalisParticle, condensation, fitScene, flightPoint, mix, phaseAt, progress,
+	random, scenePoint, seedRadius, smooth, transferSources, transferTargets, type Phase, type SceneSize,
 } from "./sceneModel.ts";
+import {
+	BUTTERFLY_PARTS, WINGBEAT, butterflyHinge, butterflyPart, wingAxis, type ButterflyPart,
+} from "./butterflyMotion.ts";
 
 type Surface = { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D };
 type Props = { stageRef: RefObject<HTMLDivElement | null>; onPhase: (phase: Phase) => void };
@@ -20,7 +23,8 @@ function surface(width: number, height: number, ratio = 1): Surface | null {
 	canvas.height = Math.max(1, Math.ceil(height * ratio));
 	const context = canvas.getContext("2d");
 	if (!context) return null;
-	context.setTransform(ratio, 0, 0, ratio, 0, 0);
+	// Integer bitmap dimensions must map back to the exact CSS rectangle.
+	context.setTransform(canvas.width / width, 0, 0, canvas.height / height, 0, 0);
 	return { canvas, context };
 }
 
@@ -72,10 +76,13 @@ async function loadArtwork(src: string) {
 
 export function ParticleScene({ stageRef, onPhase }: Props) {
 	const canvasRef = useRef<HTMLCanvasElement>(null);
+	const restingRef = useRef<HTMLDivElement>(null);
+	const wingRefs = useRef<Partial<Record<ButterflyPart, HTMLCanvasElement>>>({});
 
 	useEffect(() => {
 		const canvas = canvasRef.current;
 		const stage = stageRef.current;
+		const resting = restingRef.current;
 		const host = stage?.parentElement;
 		const context = canvas?.getContext("2d");
 		const sprite = dotSprite();
@@ -101,6 +108,7 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 		let needsResize = false;
 		let field: Surface | null = null;
 		let butterfly: Surface | null = null;
+		let wingsReady = false;
 		let butterflyBounds = { x: 0, y: 0, width: 1, height: 1 };
 		let caterpillar: HTMLImageElement | null = null;
 		let chrysalis: HTMLImageElement | null = null;
@@ -117,7 +125,7 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 			ratio = canvasRatio(scene, quality, window.devicePixelRatio);
 			canvas.width = Math.max(1, Math.round(scene.width * ratio));
 			canvas.height = Math.max(1, Math.round(scene.height * ratio));
-			context.setTransform(ratio, 0, 0, ratio, 0, 0);
+			context.setTransform(canvas.width / scene.width, 0, 0, canvas.height / scene.height, 0, 0);
 			field = surface(scene.width, scene.height, ratio);
 			if (field) {
 				for (const [from, to] of meshLineIndexes) {
@@ -132,14 +140,49 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 			butterflyBounds = { x: Math.min(...xs) - 24, y: Math.min(...ys) - 24,
 				width: Math.max(...xs) - Math.min(...xs) + 48, height: Math.max(...ys) - Math.min(...ys) + 48 };
 			butterfly = surface(butterflyBounds.width, butterflyBounds.height, ratio);
+			const layers: Partial<Record<ButterflyPart, CanvasRenderingContext2D>> = {};
+			if (resting) {
+				const hinge = butterflyHinge(scene);
+				Object.assign(resting.style, { left: `${butterflyBounds.x}px`, top: `${butterflyBounds.y}px`,
+					width: `${butterflyBounds.width}px`, height: `${butterflyBounds.height}px` });
+				resting.style.setProperty("--hinge-x", `${hinge.x - butterflyBounds.x}px`);
+				resting.style.setProperty("--hinge-y", `${hinge.y - butterflyBounds.y}px`);
+				resting.style.setProperty("--wing-axis-x", String(wingAxis.x));
+				resting.style.setProperty("--wing-axis-y", String(wingAxis.y));
+				resting.style.setProperty("--wing-duration", `${WINGBEAT.duration}ms`);
+				resting.style.setProperty("--wing-delay", `${WINGBEAT.delay}ms`);
+				for (const part of BUTTERFLY_PARTS) {
+					const layer = wingRefs.current[part];
+					const layerContext = layer?.getContext("2d");
+					if (!layer || !layerContext) continue;
+					layer.width = Math.max(1, Math.ceil(butterflyBounds.width * ratio));
+					layer.height = Math.max(1, Math.ceil(butterflyBounds.height * ratio));
+					const scaleX = layer.width / butterflyBounds.width, scaleY = layer.height / butterflyBounds.height;
+					layerContext.setTransform(scaleX, 0, 0, scaleY, -butterflyBounds.x * scaleX, -butterflyBounds.y * scaleY);
+					layer.style.setProperty("--wing-angle", `${part === "body" ? 0 : WINGBEAT[part]}deg`);
+					layers[part] = layerContext;
+				}
+			}
+			wingsReady = BUTTERFLY_PARTS.every(part => layers[part]);
 			if (butterfly) {
 				butterfly.context.translate(-butterflyBounds.x, -butterflyBounds.y);
 				for (const [from, to] of butterflyLineIndexes) {
-					drawLine(butterfly.context, scenePoint(butterflyDots[from], "butterfly", scene), scenePoint(butterflyDots[to], "butterfly", scene), .38);
+					const a = scenePoint(butterflyDots[from], "butterfly", scene), b = scenePoint(butterflyDots[to], "butterfly", scene);
+					drawLine(butterfly.context, a, b, .38);
+					const layer = layers[butterflyPart(butterflyDots[to].className)];
+					if (layer) drawLine(layer, a, b, .38);
 				}
 				for (const line of butterflyDetailLines) {
-					drawLine(butterfly.context, scenePoint(line, "butterfly", scene), scenePoint({ x: line.x2, y: line.y2 }, "butterfly", scene), (line.opacity ?? .5) * .62);
+					const a = scenePoint(line, "butterfly", scene), b = scenePoint({ x: line.x2, y: line.y2 }, "butterfly", scene);
+					const alpha = (line.opacity ?? .5) * .62;
+					drawLine(butterfly.context, a, b, alpha);
+					const layer = layers[butterflyPart(line.className)];
+					if (layer) drawLine(layer, a, b, alpha);
 				}
+			}
+			for (const dot of butterflyDots) {
+				const layer = layers[butterflyPart(dot.className)];
+				if (layer) drawDot(layer, sprite, scenePoint(dot, "butterfly", scene), finalRadius(dot.size), dot.opacity ?? .8);
 			}
 		};
 
@@ -149,6 +192,8 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 			context.clearRect(0, 0, scene.width, scene.height);
 			// Ordinary alpha compositing keeps overlapping particles from bleaching the art.
 			context.globalCompositeOperation = "source-over";
+			const restingVisible = time >= TIMING.done && wingsReady;
+			if (resting && resting.dataset.ready !== String(restingVisible)) resting.dataset.ready = String(restingVisible);
 			const morph = smooth(progress(time, TIMING.morph, TIMING.morphEnd - TIMING.morph));
 			const shell = 1 - smooth(progress(time, TIMING.release + 100, 1300));
 			if (time < TIMING.release + 1400) {
@@ -159,19 +204,19 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 				}
 				if (chrysalis && morph > 0) {
 					const rect = artworkRect("chrysalis", scene);
-					context.globalAlpha = morph * shell * .27;
+					context.globalAlpha = morph * shell * mix(.27, .20, condensation(time));
 					context.drawImage(chrysalis, rect.x, rect.y, rect.width, rect.height);
 				}
 			}
-			if (field && time > 8000) {
-				context.globalAlpha = smooth(progress(time, 8000, 1950));
+			if (field && time > TIMING.release + 1200) {
+				context.globalAlpha = smooth(progress(time, TIMING.release + 1200, 1950));
 				context.drawImage(field.canvas, 0, 0, scene.width, scene.height);
 			}
 			// Lines appear only after both permanent endpoints have arrived.
-			if (time >= TIMING.arrival + 550 && butterfly) {
+			if (!restingVisible && time >= TIMING.arrival + 550 && butterfly) {
 				context.globalAlpha = 1;
 				context.drawImage(butterfly.canvas, butterflyBounds.x, butterflyBounds.y, butterflyBounds.width, butterflyBounds.height);
-			} else if (time > TIMING.release) {
+			} else if (!restingVisible && time > TIMING.release) {
 				for (const [from, to] of butterflyLineIndexes) {
 					const fraction = smooth(progress(time, Math.max(arrivalTime(from), arrivalTime(to)), 400));
 					drawLine(context, butterflyPoint(from, time, scene), butterflyPoint(to, time, scene), .38 * fraction, fraction);
@@ -181,23 +226,20 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 					drawLine(context, scenePoint(line, "butterfly", scene), scenePoint({ x: line.x2, y: line.y2 }, "butterfly", scene), (line.opacity ?? .5) * .62 * outline);
 				}
 			}
-			if (time < TIMING.release + 1600) {
+			if (time < TIMING.release) {
 				for (let i = 0; i < PARTICLE_COUNT; i++) {
-					if (time >= TIMING.release && transferTargets[i] >= 0) continue;
+					if (time >= TIMING.condenseEnd && transferTargets[i] < 0) continue;
 					const fadeIn = smooth(progress(time, random(i, 2) * 480, 600));
-					const fadeOut = 1 - smooth(progress(time, TIMING.release + random(i, 6) * 500, 1000));
-					const point = formationPoint(i, time, scene);
-					// A small, bounded exhale replaces the old size/brightness explosion.
-					const breathe = 1 + Math.sin(progress(time, TIMING.morphEnd, TIMING.release - TIMING.morphEnd) * Math.PI) * .08;
-					drawDot(context, sprite, point, particleRadius(i, scene) * breathe, fadeIn * fadeOut * .78);
+					const particle = chrysalisParticle(i, time, scene);
+					drawDot(context, sprite, particle, particle.radius, fadeIn * particle.alpha);
 				}
 			}
-			if (time >= TIMING.release) {
+			if (!restingVisible && time >= TIMING.release) {
 				for (let target = 0; target < butterflyDots.length; target++) {
 					const source = transferSources[target];
 					const t = smooth(progress(time, TIMING.release + target * TIMING.stagger, TIMING.flight));
 					const dot = butterflyDots[target];
-					drawDot(context, sprite, flightPoint(target, time, scene), mix(particleRadius(source, scene), finalRadius(dot.size), t), mix(.78, dot.opacity ?? .8, t));
+					drawDot(context, sprite, flightPoint(target, time, scene), mix(seedRadius(source, scene), finalRadius(dot.size), t), mix(SEED_ALPHA, dot.opacity ?? .8, t));
 				}
 			}
 			context.globalAlpha = 1;
@@ -232,7 +274,7 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 			elapsed = freezeTime ?? (reduced() ? TIMING.done : Math.min(TIMING.done, elapsed + Math.min(delta, 64)));
 			paint(elapsed);
 			if (elapsed < TIMING.done && freezeTime === null) frame = requestAnimationFrame(tick);
-			// After the finale the canvas stops. A tiny compositor transform provides ambient movement.
+			// All drawing stops after the finale; cached wing layers flap via CSS only.
 		};
 		const schedule = () => {
 			if (!frame && !stopped && ready && !document.hidden) frame = requestAnimationFrame(tick);
@@ -277,5 +319,11 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 		};
 	}, [stageRef, onPhase]);
 
-	return <canvas className="scene-canvas" ref={canvasRef} aria-hidden="true" />;
+	return <>
+		<canvas className="scene-canvas" ref={canvasRef} aria-hidden="true" />
+		<div className="butterfly-rest" ref={restingRef} aria-hidden="true">
+			{BUTTERFLY_PARTS.map(part => <canvas key={part} className={`butterfly-layer butterfly-${part}`}
+				ref={element => { if (element) wingRefs.current[part] = element; else delete wingRefs.current[part]; }} />)}
+		</div>
+	</>;
 }

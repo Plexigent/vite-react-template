@@ -39,14 +39,39 @@
 }
 .scene-stage { position: relative; width: 100%; height: 100%; }
 .scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.phase-done .scene-canvas { animation: scene-drift 24s ease-in-out infinite alternate; }
+.phase-done .scene-canvas,
+.phase-done .butterfly-rest { animation: scene-drift 24s ease-in-out infinite alternate; }
 @keyframes scene-drift {
 	from { transform: translate3d(0, 0, 0); }
 	to { transform: translate3d(2px, -3px, 0); }
 }
-.scene-stage[data-hidden="true"] .scene-canvas { animation-play-state: paused; }
-.scene-stage[data-reduced-motion="true"] .scene-canvas,
-.scene-stage[data-frozen="true"] .scene-canvas { animation: none; }
+.butterfly-rest { position: absolute; visibility: hidden; pointer-events: none; }
+.butterfly-rest[data-ready="true"] { visibility: visible; }
+.butterfly-layer {
+	position: absolute;
+	inset: 0;
+	width: 100%;
+	height: 100%;
+	transform-origin: var(--hinge-x) var(--hinge-y);
+}
+.phase-done .butterfly-foreground {
+	animation: wing-foreground var(--wing-duration) ease-in-out var(--wing-delay) infinite;
+}
+.phase-done .butterfly-background {
+	animation: wing-background var(--wing-duration) ease-in-out var(--wing-delay) infinite;
+}
+/* A shallow fold around the body, followed by a longer relaxed opening. */
+@keyframes wing-foreground {
+	0%, 12%, 82%, 100% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, 0deg); }
+	43% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, var(--wing-angle)); }
+}
+@keyframes wing-background {
+	0%, 8%, 78%, 100% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, 0deg); }
+	39% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, var(--wing-angle)); }
+}
+.scene-stage[data-hidden="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer) { animation-play-state: paused; }
+.scene-stage[data-reduced-motion="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer),
+.scene-stage[data-frozen="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer) { animation: none; }
 
 .wordmark-stage {
 	position: absolute;
@@ -141,7 +166,7 @@
 	.question-orb:hover::before { box-shadow: inset -2px -3px 5px rgba(0,0,0,.24), 0 0 24px rgba(248,251,255,.3); }
 }
 @media (prefers-reduced-motion: reduce) {
-	.scene-canvas { animation: none !important; }
+	.scene-canvas, .butterfly-rest, .butterfly-layer { animation: none !important; }
 	.wordmark-stage, .wordmark-overlay, .base-letter, .question-orb { transition-duration: 120ms; }
 	.question-orb { animation: none !important; }
 }
