@@ -69,9 +69,9 @@
 	0%, 8%, 78%, 100% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, 0deg); }
 	39% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, var(--wing-angle)); }
 }
-.scene-stage[data-hidden="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer) { animation-play-state: paused; }
-.scene-stage[data-reduced-motion="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer),
-.scene-stage[data-frozen="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer) { animation: none; }
+.scene-stage[data-hidden="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer, .letter-accent-pulse) { animation-play-state: paused; }
+.scene-stage[data-reduced-motion="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer, .letter-accent-pulse),
+.scene-stage[data-frozen="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer, .letter-accent-pulse) { animation: none; }
 
 .wordmark-stage {
 	position: absolute;
@@ -99,12 +99,34 @@
 }
 .wordmark-base { display: inline-flex; }
 .base-letter {
+	position: relative;
 	display: inline-block;
 	opacity: 1;
 	transition: color 850ms linear, opacity 850ms linear;
 }
 .base-letter.matched { color: #79f0a4; }
 .base-letter.dimmed { opacity: .08; }
+.letter-accent, .letter-accent-pulse { position: absolute; inset: 0; pointer-events: none; }
+.letter-accent {
+	color: var(--node-teal, #bbf5eb);
+	clip-path: var(--accent-clip, inset(100%));
+	text-shadow: none;
+	transition: opacity 850ms linear;
+}
+.letter-accent::before, .letter-accent-pulse::before { content: attr(data-glyph); }
+.letter-accent-pulse { color: var(--node-bright, #f3fffc); opacity: 0; }
+.phase-done .letter-accent-pulse {
+	animation: wordmark-node-pulse var(--wing-duration) ease-in-out var(--wing-delay) infinite;
+}
+/* Same stops, easing, delay and start event as the foreground wing. */
+@keyframes wordmark-node-pulse {
+	0%, 12%, 82%, 100% { opacity: 0; }
+	43% { opacity: 1; }
+}
+/* Keep the existing green word-association reveal unaltered; do not restart the pulse clock. */
+.wordmark-stage[data-revealing="true"] .letter-accent { opacity: 0; }
+.wordmark-baseline-probe { position: absolute; top: 0; left: 0; visibility: hidden; pointer-events: none; }
+.wordmark-baseline-probe > span { display: inline-block; width: 0; height: 0; vertical-align: baseline; }
 .wordmark-overlay {
 	position: absolute;
 	top: 0;
@@ -128,18 +150,19 @@
 .wordmark-measure { position: absolute; top: 0; left: 0; display: inline-flex; }
 .wordmark-measure > span { display: inline-block; }
 
-.question-orb {
+.question-trigger {
 	position: absolute;
+	font-family: inherit;
 	top: calc(100% + 18px);
-	left: 50%;
+	left: var(--question-x, 50%);
 	display: grid;
 	width: clamp(44px, 4vw, 56px);
 	height: clamp(44px, 4vw, 56px);
 	padding: 0;
 	place-items: center;
 	border: 0;
-	border-radius: 50%;
-	color: #071014;
+	border-radius: 4px;
+	color: #fff;
 	background: transparent;
 	cursor: pointer;
 	transform: translateX(-50%);
@@ -148,25 +171,22 @@
 	-webkit-tap-highlight-color: transparent;
 	touch-action: manipulation;
 }
-.question-orb::before {
-	content: "";
-	position: absolute;
-	inset: 6px;
-	border-radius: 50%;
-	background: radial-gradient(circle at 32% 24%, #fff 0 14%, #f8fbff 28%, #cad3dc 58%, #83909a 100%);
-	box-shadow: inset -2px -3px 5px rgba(0,0,0,.24), 0 0 20px rgba(248,251,255,.16);
+.question-trigger span {
+	font-family: inherit;
+	font-size: clamp(28px, 3vw, 40px);
+	font-weight: 400;
+	line-height: 1;
 }
-.question-orb span { position: relative; font: 700 13px/1 system-ui, sans-serif; }
-.phase-done .question-orb:not(.hidden) { animation: orb-in 500ms 650ms both; }
-@keyframes orb-in { from { opacity: 0; } to { opacity: 1; } }
-.question-orb:focus-visible { outline: 2px solid #79f0a4; outline-offset: 3px; }
-.question-orb.hidden { opacity: 0; pointer-events: none; }
-.question-orb:disabled { cursor: default; }
+.phase-done .question-trigger:not(.hidden) { animation: question-in 500ms 650ms both; }
+@keyframes question-in { from { opacity: 0; } to { opacity: 1; } }
+.question-trigger:focus-visible { outline: 2px solid #79f0a4; outline-offset: 3px; }
+.question-trigger.hidden { opacity: 0; pointer-events: none; }
+.question-trigger:disabled { cursor: default; }
 @media (hover: hover) {
-	.question-orb:hover::before { box-shadow: inset -2px -3px 5px rgba(0,0,0,.24), 0 0 24px rgba(248,251,255,.3); }
+	.question-trigger:hover { color: var(--node-bright, #f3fffc); text-shadow: 0 0 12px rgba(187,245,235,.3); }
 }
 @media (prefers-reduced-motion: reduce) {
-	.scene-canvas, .butterfly-rest, .butterfly-layer { animation: none !important; }
-	.wordmark-stage, .wordmark-overlay, .base-letter, .question-orb { transition-duration: 120ms; }
-	.question-orb { animation: none !important; }
+	.scene-canvas, .butterfly-rest, .butterfly-layer, .letter-accent-pulse { animation: none !important; }
+	.wordmark-stage, .wordmark-overlay, .base-letter, .letter-accent, .question-trigger { transition-duration: 120ms; }
+	.question-trigger { animation: none !important; }
 }

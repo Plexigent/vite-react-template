@@ -41,6 +41,7 @@
 		"dev": "vite",
 		"lint": "eslint .",
 		"test:scene": "node --test scripts/scene.test.mjs",
+		"test:wordmark": "node --test scripts/wordmark.test.mjs",
 		"preview": "npm run build && vite preview"
 	},
 	"type": "module"

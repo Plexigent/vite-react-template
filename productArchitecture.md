@@ -8,6 +8,8 @@
 
 **Current State:** Visual MVP / design prototype. The September 2026 animation pass replaces legacy hand-drawn particle targets and per-frame React graphics with artwork-derived destinations and a cached canvas renderer. The September 18 follow-up adds a spaced 192-to-23 chrysalis consolidation and a perpetual, shallow butterfly wingbeat. The chrysalis-only refinement slows consolidation and adds bright planetary orbits before the final dissolve. Local validation is complete; real-device cross-browser profiling remains outstanding.
 
+**September 20 wordmark refinement:** The rising `/` stroke of the existing lowercase `x` and the dot of `i` use the same teal/bright colors as the nodes, pulsing with the foreground wing. The original font, letter shapes and spacing remain unchanged. The circular question button is now a larger plain white `?`, centered beneath the actual `i` dot at the same vertical position.
+
 ## 2. Architecture Reference
 
 **Tech Stack:** Vite, React, TypeScript, CSS, Cloudflare Git Integration. No animation libraries; use React, CSS, and HTML canvas only.
@@ -17,12 +19,15 @@
 - `src/react-app/ParticleScene.tsx`: canvas renderer, cached dot sprites/linework, image decoding, lifecycle, adaptive resolution and accessibility.
 - `src/react-app/sceneModel.ts`: pure layout transforms, phase timing, particle paths and continuous butterfly handoff.
 - `src/react-app/butterflyMotion.ts`: shared wing/body classification, diagonal hinge, wingbeat settings and projection math for tests.
+- `src/react-app/wordmarkAccents.ts`: cached font-aware glyph measurements; isolates the rising x stroke and i dot for clipped HTML overlays, without replacing the font.
+- `src/react-app/scenePalette.ts`: shared node/wordmark teal and highlight colors.
 - `src/react-app/sceneGeometry.ts`: original final-scene dot and line primitives.
 - `src/react-app/artworkPoints.ts`: 192 inset destinations for each current PNG silhouette, prepaired for the morph; includes source hashes.
 - `src/react-app/App.css`: safe-area layout, static atmospheric background, wordmark/button styling, gentle final drift and cached-wing CSS animation.
 - `src/react-app/index.css`: global/root page behavior.
 - `scripts/generate-artwork-points.py`: offline silhouette filling, evenly spaced sampling and minimum-cost pairing; Pillow/NumPy only, never runs in the browser.
 - `scripts/scene.test.mjs`: artwork freshness, alignment, phase boundaries, transfer continuity and viewport/pixel-budget tests.
+- `scripts/wordmark.test.mjs`: glyph-part isolation and pulse/wing cadence, color and motion-safeguard checks.
 
 **Scene Model:**
 - One full-screen landing page with centered `Plexigent` wordmark.
@@ -35,7 +40,8 @@
 - Each selected chrysalis dot becomes its permanent butterfly dot, with identical endpoint coordinates and no fade-out/replacement. Butterfly proportions use uniform scaling.
 - Final scene retains 31 lower-left dots, 29 middle mesh dots, 23 butterfly dots and the original line primitives. At the finale, the butterfly switches from the shared canvas to three pre-rendered small canvases (far wing, near wing, stationary body), with identical open-pose geometry.
 - After the wordmark/button entrance (1.2s delay), the wings fold gently around the slanted body axis on a 6.2s loop: near wing 25 degrees, far wing -32 degrees with slight timing offset. Dots and veins transform together; body and antennae remain fixed relative to the butterfly. No full-page redraw loop resumes.
-- Final wordmark and spherical `?` button appear last.
+- Final wordmark and plain white `?` control appear last. The control retains its 44px-minimum invisible hit area and previous vertical offset (18px below the heading), but aligns horizontally with the measured i-dot center.
+- The wordmark accents brighten at the foreground wing's deepest fold and return to baseline teal on opening. Both use the same 6.2s duration, 1.2s delay, easing and 0/12/43/82/100% keyframe stops, starting together at `phase-done`.
 
 **Performance Design:**
 - One full-stage canvas prevents transfer clipping. Initial DPR is capped at 1.75 with a 2.4-million-pixel budget; sustained slow frames can lower DPR further. No browser-name detection.
@@ -43,6 +49,7 @@
 - Source-over compositing and restrained dot sizes avoid the former bright, oversized chrysalis effect.
 - React updates at phase changes, not on every animation frame. All canvas drawing stops after the finale; CSS supplies wingbeats and a tiny shared translation. Wing bitmaps rebuild only for resize/resolution changes.
 - Hidden tabs pause the scene clock, CSS drift and wingbeats. Reduced-motion preference skips directly to the static, open-wing final composition. Frozen development beats also disable wing motion.
+- Accent brightness uses opacity on a clipped highlight layer, with no JavaScript animation loop. Hidden/reduced-motion/frozen states use the same safeguards as the wings; reduced motion retains static teal accents. Font sampling occurs only during layout/font changes and is cached, not every frame.
 - Resize/orientation events are coalesced into one rebuild per frame and preserve animation time.
 - Static radial backgrounds replace continuously blurred, oversized animated layers. No new runtime libraries or GPU APIs are required.
 
@@ -57,7 +64,8 @@
 - Perpetual, slow butterfly wingbeat after the full entrance, without per-frame JavaScript rendering.
 - Final lower-left/middle/butterfly dot systems reveal only late in the sequence.
 - `Plexigent` fades in after the visual reveal.
-- Spherical `?` button appears after a slight pause.
+- Larger white `?` character appears after the existing slight pause, centered below the i, with keyboard/touch behavior preserved.
+- Font-matched teal rising-x and i-dot overlays pulse alongside wingbeats. During the green word-association sequence, accents fade out without restarting their pulse clock, then return afterward.
 - Button cycles word associations in a cinematic progression: `ComPlex`, `exigent`, `Intelligent`, `Plexippus`.
 - iOS/phone-safe portrait composition with aligned intro/final graphics and reveal words constrained to the visible stage.
 - Dynamic viewport units, safe-area insets, and `viewport-fit=cover` support for mobile browser chrome and device cutouts.
@@ -70,10 +78,10 @@
 - Avoid adding libraries unless explicitly requested.
 - Avoid broad visual changes; update one animation beat at a time.
 
-**Validation:** TypeScript, React source lint, production build and seven automated scene tests pass. Tests cover source-image freshness, alignment, flight continuity, pixel budget, monotonic 192-to-23 reduction, visible core separation, seed clearance, orbital containment/bright hold/late fade, fixed wing hinge and unclipped extreme poses across eight viewport sizes. Local browser checks cover phone/desktop composition, moving wing transforms with an unchanged final drawing count, and reduced-motion handling; the orbital refinement was also watched during normal playback on a phone-sized viewport. Earlier checks covered word containment and mid-intro rotation. These are not evidence of performance on physical iOS/Android devices or all browser engines.
+**Validation:** TypeScript, React source lint, production build, seven scene tests and three wordmark tests pass. Tests cover source-image freshness, alignment, flight continuity, pixel budget, monotonic 192-to-23 reduction, visible core separation, seed clearance, orbital containment/bright hold/late fade, fixed wing hinge and unclipped extreme poses across eight viewport sizes, plus glyph-part isolation and matching pulse cadence. Local browser checks cover phone/desktop composition, moving wing transforms with an unchanged final drawing count, reduced-motion handling, glyph clipping, i-aligned button placement, and keyboard activation/completion of the existing word reveal. Earlier checks covered word containment and mid-intro rotation. These are not evidence of performance on physical iOS/Android devices or all browser engines.
 
 **Developer Checks:**
-- `npm run build`, `npm run lint`, `npm run test:scene` (scene tests require a Node release with native TypeScript stripping, verified with Node 24).
+- `npm run build`, `npm run lint`, `npm run test:scene`, `npm run test:wordmark` (tests require a Node release with native TypeScript stripping, verified with Node 24).
 - `python3 scripts/generate-artwork-points.py --check` requires Pillow and NumPy; verifies committed destinations against the current images. Without `--check`, it prints generated geometry as JSON. Regenerate `artworkPoints.ts` whenever artwork changes; source-hash tests intentionally reject stale geometry.
 - Development-only `?sceneTime=4000`, `6200`, `7800`, `10100`, `11900`, or `14300` freezes the caterpillar, gathering chrysalis, orbits, 23 seeds, flight or final open-wing pose; `?sceneMotion=reduce` checks the static reduced-motion scene. These controls are ignored by production builds.
 - Development-only canvas data attributes expose elapsed time, draw count, DPR and average JavaScript drawing time. They are diagnostic aids, not end-to-end GPU or device benchmarks.

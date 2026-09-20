@@ -13,6 +13,7 @@ import {
 import {
 	BUTTERFLY_PARTS, WINGBEAT, butterflyHinge, butterflyPart, wingAxis, type ButterflyPart,
 } from "./butterflyMotion.ts";
+import { NODE_BRIGHT, NODE_TEAL } from "./scenePalette.ts";
 
 type Surface = { canvas: HTMLCanvasElement; context: CanvasRenderingContext2D };
 type Props = { stageRef: RefObject<HTMLDivElement | null>; onPhase: (phase: Phase) => void };
@@ -39,8 +40,8 @@ function dotSprite(): HTMLCanvasElement | null {
 	context.fillStyle = halo;
 	context.fillRect(0, 0, 64, 64);
 	const core = context.createRadialGradient(29, 29, 1, 32, 32, 9);
-	core.addColorStop(0, "#f3fffc");
-	core.addColorStop(.55, "#bbf5eb");
+	core.addColorStop(0, NODE_BRIGHT);
+	core.addColorStop(.55, NODE_TEAL);
 	core.addColorStop(1, "rgba(140,230,224,.25)");
 	context.fillStyle = core;
 	context.beginPath();
@@ -121,6 +122,10 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 			stage.style.width = `${scene.width}px`;
 			stage.style.height = `${scene.height}px`;
 			stage.style.setProperty("--scene-width", `${scene.width}px`);
+			stage.style.setProperty("--wing-duration", `${WINGBEAT.duration}ms`);
+			stage.style.setProperty("--wing-delay", `${WINGBEAT.delay}ms`);
+			stage.style.setProperty("--node-teal", NODE_TEAL);
+			stage.style.setProperty("--node-bright", NODE_BRIGHT);
 			stage.dataset.layout = scene.portrait ? "portrait" : "landscape";
 			ratio = canvasRatio(scene, quality, window.devicePixelRatio);
 			canvas.width = Math.max(1, Math.round(scene.width * ratio));
@@ -149,8 +154,6 @@ export function ParticleScene({ stageRef, onPhase }: Props) {
 				resting.style.setProperty("--hinge-y", `${hinge.y - butterflyBounds.y}px`);
 				resting.style.setProperty("--wing-axis-x", String(wingAxis.x));
 				resting.style.setProperty("--wing-axis-y", String(wingAxis.y));
-				resting.style.setProperty("--wing-duration", `${WINGBEAT.duration}ms`);
-				resting.style.setProperty("--wing-delay", `${WINGBEAT.delay}ms`);
 				for (const part of BUTTERFLY_PARTS) {
 					const layer = wingRefs.current[part];
 					const layerContext = layer?.getContext("2d");

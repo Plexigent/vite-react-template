@@ -2,6 +2,7 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { flushSync } from "react-dom";
 import { ParticleScene } from "./ParticleScene";
 import type { Phase } from "./sceneModel";
+import { clearAccentCache, measureAccent } from "./wordmarkAccents";
 import "./App.css";
 
 type RevealWord = { baseStart: number; length: number; text: string; wordStart: number };
@@ -57,6 +58,7 @@ function App() {
 	const letterRefs = useRef<Array<HTMLSpanElement | null>>([]);
 	const overlayRef = useRef<HTMLSpanElement>(null);
 	const measureRefs = useRef<Array<HTMLSpanElement | null>>([]);
+	const baselineRef = useRef<HTMLSpanElement>(null);
 	const revealWords = useMemo(() => REVEAL_WORDS.map(getRevealWord), []);
 	const [activeRevealIndex, setActiveRevealIndex] = useState<number | null>(null);
 	const [isRevealVisible, setIsRevealVisible] = useState(false);
@@ -95,6 +97,19 @@ function App() {
 			const available = Math.max(1, stage.clientWidth - 40);
 			const fitted = Math.min(desired, font * available / Math.max(1, 2 * extent));
 			if (Math.abs(font - fitted) > .1) heading.style.fontSize = `${fitted}px`;
+			const marker = baselineRef.current;
+			const baseline = marker && marker.parentElement
+				? marker.getBoundingClientRect().top - marker.parentElement.getBoundingClientRect().top : 0;
+			for (const [index, letter] of [[3, "x"], [4, "i"]] as const) {
+				const element = letterRefs.current[index];
+				if (!element) continue;
+				const accent = measureAccent(letter, element, baseline);
+				if (accent) element.style.setProperty("--accent-clip", accent.clip);
+				if (letter === "i") {
+					const bounds = element.getBoundingClientRect();
+					heading.parentElement?.style.setProperty("--question-x", `${bounds.left - heading.getBoundingClientRect().left + (accent?.center ?? bounds.width / 2)}px`);
+				}
+			}
 			if (activeRevealIndex !== null && overlayRef.current) {
 				const row = measureRefs.current[activeRevealIndex];
 				const word = revealWords[activeRevealIndex];
@@ -109,8 +124,10 @@ function App() {
 		measure();
 		const observer = new ResizeObserver(measure);
 		observer.observe(stage);
-		void document.fonts.ready.then(measure);
-		return () => { alive = false; observer.disconnect(); };
+		const fontsChanged = () => { clearAccentCache(); measure(); };
+		void document.fonts.ready.then(fontsChanged);
+		document.fonts.addEventListener("loadingdone", fontsChanged);
+		return () => { alive = false; observer.disconnect(); document.fonts.removeEventListener("loadingdone", fontsChanged); };
 	}, [activeRevealIndex, revealWords]);
 
 	const startRevealSequence = async () => {
@@ -147,7 +164,7 @@ function App() {
 			<div className="scene-safe-area">
 				<div className="scene-stage" ref={stageRef}>
 					<ParticleScene stageRef={stageRef} onPhase={setPhase} />
-					<div className="wordmark-stage">
+					<div className="wordmark-stage" data-revealing={isSequenceRunning}>
 						<h1 className="wordmark" ref={wordmarkRef}>
 							<span className="wordmark-base" aria-label={WORDMARK}>
 								{WORDMARK.split("").map((letter, index) => (
@@ -167,9 +184,13 @@ function App() {
 										}`}
 									>
 										{letter}
+										{(index === 3 || index === 4) && <span className="letter-accent" data-glyph={letter} aria-hidden="true">
+											<span className="letter-accent-pulse" data-glyph={letter} />
+										</span>}
 									</span>
 								))}
 							</span>
+							<span className="wordmark-baseline-probe" aria-hidden="true">M<span ref={baselineRef} /></span>
 							{activeReveal ? (
 								<span
 									aria-hidden="true"
@@ -202,7 +223,7 @@ function App() {
 						</h1>
 						<button
 							type="button"
-							className={`question-orb ${isSequenceRunning ? "hidden" : ""}`}
+							className={`question-trigger ${isSequenceRunning ? "hidden" : ""}`}
 							aria-label="Reveal Plexigent word associations"
 							onClick={startRevealSequence}
 							disabled={phase !== "done" || isSequenceRunning}
