@@ -1,192 +1,158 @@
-#root { width: 100%; height: 100%; overflow: hidden; }
-.landing {
-	position: relative;
-	width: 100%;
-	height: 100vh;
-	height: 100dvh;
-	min-height: 100svh;
-	overflow: hidden;
-	isolation: isolate;
-	background:
-		radial-gradient(ellipse at 49% 43%, rgba(192, 224, 238, .12), transparent 38%),
-		linear-gradient(135deg, #071014 0%, #121826 43%, #05080d 100%);
-}
+#plexigent-emergence-study{--px-bg:#070b10;--px-ink:#f1f4f5;--px-muted:#a2aeb5;--px-cyan:#4ce2f2;color:var(--px-ink);font-family:Arial,Helvetica,sans-serif;width:100%;color-scheme:dark}
+    #plexigent-emergence-study *{box-sizing:border-box}
+    #plexigent-emergence-study .px-stage{position:relative;isolation:isolate;min-height:640px;overflow:hidden;background:radial-gradient(ellipse at 48% 60%,#10202a 0%,#090f16 45%,var(--px-bg) 80%);display:flex;flex-direction:column}
+    #plexigent-emergence-study button,#plexigent-emergence-study a{font:inherit;color:inherit}
+    #plexigent-emergence-study button{border:0;background:none;padding:0}
+    #plexigent-emergence-study .px-header{position:relative;z-index:4;display:flex;align-items:center;justify-content:space-between;gap:20px;padding:32px 38px 0}
+    #plexigent-emergence-study .px-home{min-width:44px;min-height:44px;display:flex;align-items:center;text-decoration:none}
+    #plexigent-emergence-study .px-mark{display:inline-flex;font-size:42px;line-height:1;letter-spacing:-2px;font-weight:400}
+    #plexigent-emergence-study .px-glyph{position:relative;display:inline-block}
+    #plexigent-emergence-study .px-accent{position:absolute;inset:0;color:var(--px-cyan);pointer-events:none}
+    #plexigent-emergence-study .px-glyph-x .px-accent{clip-path:polygon(70% 23%,100% 23%,30% 86%,0% 86%)}
+    #plexigent-emergence-study .px-glyph-i .px-accent{clip-path:inset(0 0 70% 0)}
+    #plexigent-emergence-study .px-menu-toggle{display:flex;align-items:center;justify-content:center;gap:12px;min-height:44px;min-width:76px;font-size:13px;letter-spacing:.04em}
+    #plexigent-emergence-study .px-menu-lines{position:relative;width:20px;height:12px;border-top:1px solid currentColor;border-bottom:1px solid currentColor}
+    #plexigent-emergence-study .px-menu-toggle[aria-expanded=true] .px-menu-lines{height:1px;border-bottom:0;transform:rotate(45deg)}
+    #plexigent-emergence-study .px-menu-toggle[aria-expanded=true] .px-menu-lines:after{content:"";position:absolute;inset:-1px 0 auto;height:1px;background:currentColor;transform:rotate(90deg)}
+    #plexigent-emergence-study .px-menu{position:relative;z-index:3;background:var(--px-bg);padding:42px 12% 36px;min-height:470px}
+    #plexigent-emergence-study [hidden]{display:none!important}
+    #plexigent-emergence-study .px-menu-nav{display:grid;gap:0;max-width:660px;margin:auto}
+    #plexigent-emergence-study .px-menu-nav a{display:flex;align-items:center;min-height:58px;text-decoration:none;font-size:clamp(21px,3.5vw,32px);letter-spacing:-.04em;width:fit-content;max-width:100%}
+    #plexigent-emergence-study .px-menu-nav a:hover{color:var(--px-cyan)}
+    #plexigent-emergence-study .px-menu-secondary{display:flex;flex-wrap:wrap;gap:24px;margin-top:26px;border-top:1px solid #243039;padding-top:18px}
+    #plexigent-emergence-study .px-menu-secondary a{font-size:15px;letter-spacing:0;min-height:44px}
+    #plexigent-emergence-study .px-scene{position:relative;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:76px 28px 0;min-height:410px;text-align:center;touch-action:pan-x pinch-zoom}
+    #plexigent-emergence-study .px-copy{position:relative;z-index:2;width:100%;max-width:800px}
+    #plexigent-emergence-study .px-kicker{margin:0 0 18px;color:var(--px-muted);font-size:13px;letter-spacing:.2em;font-weight:400}
+    #plexigent-emergence-study .px-title{margin:0;color:var(--px-ink);font-size:clamp(36px,6.2vw,66px);line-height:1.06;letter-spacing:-.055em;font-weight:400;text-wrap:balance}
+    #plexigent-emergence-study .px-prompt{margin:23px auto 0;max-width:480px;font-size:clamp(16px,2.4vw,20px);line-height:1.45;font-weight:400;letter-spacing:-.015em;color:#c4cdd2;text-wrap:balance}
+    #plexigent-emergence-study .px-contact{display:inline-flex;align-items:center;justify-content:center;margin-top:28px;min-height:44px;font-size:17px;text-decoration:none;border-bottom:1px solid #4ce2f260}
+    #plexigent-emergence-study .px-canvas{position:absolute;left:0;bottom:0;width:100%;height:220px;pointer-events:none;opacity:.9}
+    #plexigent-emergence-study .px-footer{position:relative;z-index:2;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:15px;padding:20px 38px 30px;min-height:90px}
+    #plexigent-emergence-study .px-position{display:flex;gap:10px;align-items:center;color:var(--px-muted);font-size:11px;letter-spacing:.08em}
+    #plexigent-emergence-study .px-position:before{content:"";display:block;width:4px;height:4px;border-radius:50%;background:var(--px-cyan)}
+    #plexigent-emergence-study .px-next{display:flex;align-items:center;justify-content:center;gap:12px;min-height:44px;max-width:100%;font-size:14px;white-space:nowrap}
+    #plexigent-emergence-study .px-next:hover{color:var(--px-cyan)}
+    #plexigent-emergence-study .px-chevron{width:7px;height:7px;border-right:1px solid currentColor;border-bottom:1px solid currentColor;transform:rotate(45deg);margin-top:-4px}
+    #plexigent-emergence-study .px-back{justify-self:end;min-height:44px;min-width:44px;color:var(--px-muted);font-size:13px}
+    #plexigent-emergence-study .px-wordmark{font-size:inherit;letter-spacing:inherit}
+    #plexigent-emergence-study .px-wordmark .px-mark{font-size:inherit;letter-spacing:inherit}
+    @media(max-width:540px){#plexigent-emergence-study .px-stage{min-height:640px}#plexigent-emergence-study .px-header{padding:24px 24px 0}#plexigent-emergence-study .px-scene{padding:92px 24px 0;min-height:420px}#plexigent-emergence-study .px-title{font-size:clamp(34px,8.8vw,47px)}#plexigent-emergence-study .px-footer{padding:16px 24px 24px;grid-template-columns:40px 1fr 40px;gap:6px}#plexigent-emergence-study .px-position{font-size:10px;gap:5px}#plexigent-emergence-study .px-next{font-size:12px;gap:8px}#plexigent-emergence-study .px-menu{padding:40px 24px 30px;min-height:486px}#plexigent-emergence-study .px-menu-nav a{font-size:24px;line-height:1.2;min-height:65px}#plexigent-emergence-study .px-menu-secondary a{font-size:15px;min-height:44px}#plexigent-emergence-study .px-prompt{max-width:300px}}
 
-/* Soft radial falloffs replace continuously filtered oversized surfaces. */
-.aura { position: absolute; inset: 0; pointer-events: none; }
-.aura-one {
-	background: radial-gradient(ellipse at 17% 35%, rgba(43, 180, 167, .15), transparent 65%);
-}
-.aura-two {
-	background: radial-gradient(ellipse at 78% 60%, rgba(133, 109, 208, .17), transparent 65%);
-}
-.signal-grid {
-	position: absolute;
-	inset: 0;
-	pointer-events: none;
-	background-image: linear-gradient(rgba(255,255,255,.035) 1px, transparent 1px),
-		linear-gradient(90deg, rgba(255,255,255,.025) 1px, transparent 1px);
-	background-size: 4rem 4rem;
-	mask-image: radial-gradient(ellipse at center, black, transparent 70%);
-	opacity: .25;
-}
-.scene-safe-area {
-	position: absolute;
-	inset: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
-		env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
-	display: grid;
-	place-items: center;
-}
-.scene-stage { position: relative; width: 100%; height: 100%; }
-.scene-canvas { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
-.phase-done .scene-canvas,
-.phase-done .butterfly-rest { animation: scene-drift 24s ease-in-out infinite alternate; }
-@keyframes scene-drift {
-	from { transform: translate3d(0, 0, 0); }
-	to { transform: translate3d(2px, -3px, 0); }
-}
-.butterfly-rest { position: absolute; visibility: hidden; pointer-events: none; }
-.butterfly-rest[data-ready="true"] { visibility: visible; }
-.butterfly-layer {
-	position: absolute;
-	inset: 0;
-	width: 100%;
-	height: 100%;
-	transform-origin: var(--hinge-x) var(--hinge-y);
-}
-.phase-done .butterfly-foreground {
-	animation: wing-foreground var(--wing-duration) ease-in-out var(--wing-delay) infinite;
-}
-.phase-done .butterfly-background {
-	animation: wing-background var(--wing-duration) ease-in-out var(--wing-delay) infinite;
-}
-/* A shallow fold around the body, followed by a longer relaxed opening. */
-@keyframes wing-foreground {
-	0%, 12%, 82%, 100% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, 0deg); }
-	43% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, var(--wing-angle)); }
-}
-@keyframes wing-background {
-	0%, 8%, 78%, 100% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, 0deg); }
-	39% { transform: rotate3d(var(--wing-axis-x), var(--wing-axis-y), 0, var(--wing-angle)); }
-}
-.scene-stage[data-hidden="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer, .letter-accent-pulse) { animation-play-state: paused; }
-.scene-stage[data-reduced-motion="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer, .letter-accent-pulse),
-.scene-stage[data-frozen="true"] :is(.scene-canvas, .butterfly-rest, .butterfly-layer, .letter-accent-pulse) { animation: none; }
+    #plexigent-emergence-study .px-origin{position:absolute;inset:0 0 auto;width:100%;height:300px;pointer-events:none}
+    #plexigent-emergence-study .px-scene.px-is-home{padding:0;min-height:450px}
+    #plexigent-emergence-study .px-is-home .px-copy{position:absolute;top:302px;left:0;padding:0 22px;max-width:none;opacity:0;transform:translateY(12px);visibility:hidden;transition:opacity .9s ease,transform 1.1s cubic-bezier(.16,1,.3,1)}
+    #plexigent-emergence-study .px-is-home.px-origin-done .px-copy{visibility:visible;opacity:1;transform:translateY(0)}
+    #plexigent-emergence-study .px-is-home .px-title{font-size:clamp(46px,7.3vw,82px);letter-spacing:-.06em}
+    #plexigent-emergence-study .px-is-home .px-prompt{font-size:13px;letter-spacing:.12em;margin-top:18px;color:var(--px-muted)}
+    #plexigent-emergence-study .px-footer-left{display:flex;align-items:center;min-width:44px}
+    #plexigent-emergence-study .px-replay{min-height:44px;min-width:44px;color:var(--px-muted);font-size:12px;text-align:left}
+    #plexigent-emergence-study .px-footer.px-waiting .px-next{visibility:hidden;pointer-events:none}
+    @media(max-width:540px){#plexigent-emergence-study .px-is-home .px-title{font-size:clamp(47px,13vw,65px)}#plexigent-emergence-study .px-scene.px-is-home{min-height:450px}#plexigent-emergence-study .px-is-home .px-copy{top:301px}#plexigent-emergence-study .px-is-home .px-prompt{font-size:12px}}
+    @media(prefers-reduced-motion:reduce){#plexigent-emergence-study .px-is-home .px-copy{transition:none;transform:none}}
 
-.wordmark-stage {
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	z-index: 1;
-	transform: translate(-50%, -50%);
-	opacity: 0;
-	visibility: hidden;
-	transition: opacity 950ms ease;
+/* Production viewport composition; the artwork's internal coordinates stay exact. */
+#plexigent-emergence-study .px-stage {
+  min-height: 100svh;
+  min-height: 100dvh;
+  overflow: clip;
 }
-.phase-done .wordmark-stage { opacity: 1; visibility: visible; }
-.wordmark {
-	position: relative;
-	width: max-content;
-	margin: 0;
-	padding: 0;
-	color: #f8fbff;
-	font-size: clamp(32px, 13vw, 160px);
-	font-weight: 500;
-	letter-spacing: 0;
-	line-height: 1;
-	white-space: nowrap;
-	text-shadow: 0 0 1.8rem rgba(153,244,236,.16);
+#plexigent-emergence-study .px-header {
+  padding: max(24px, env(safe-area-inset-top)) max(24px, env(safe-area-inset-right)) 0 max(24px, env(safe-area-inset-left));
 }
-.wordmark-base { display: inline-flex; }
-.base-letter {
-	position: relative;
-	display: inline-block;
-	opacity: 1;
-	transition: color 850ms linear, opacity 850ms linear;
+#plexigent-emergence-study .px-scene {
+  min-height: 450px;
+  padding-top: max(76px, calc((100dvh - 616px) / 2 + 76px));
+  padding-bottom: 240px;
+  touch-action: pan-y pinch-zoom;
 }
-.base-letter.matched { color: #79f0a4; }
-.base-letter.dimmed { opacity: .08; }
-.letter-accent, .letter-accent-pulse { position: absolute; inset: 0; pointer-events: none; }
-.letter-accent {
-	color: var(--node-teal, #bbf5eb);
-	clip-path: var(--accent-clip, inset(100%));
-	text-shadow: none;
-	transition: opacity 850ms linear;
+#plexigent-emergence-study .px-scene.px-is-home {
+  padding: 0;
+  min-height: 450px;
 }
-.letter-accent::before, .letter-accent-pulse::before { content: attr(data-glyph); }
-.letter-accent-pulse { color: var(--node-bright, #f3fffc); opacity: 0; }
-.phase-done .letter-accent-pulse {
-	animation: wordmark-node-pulse var(--wing-duration) ease-in-out var(--wing-delay) infinite;
+#plexigent-emergence-study .px-origin {
+  top: max(0px, calc((100% - 450px) / 2));
+  left: 50%;
+  width: 100%;
+  max-width: 1100px;
+  transform: translateX(-50%);
 }
-/* Same stops, easing, delay and start event as the foreground wing. */
-@keyframes wordmark-node-pulse {
-	0%, 12%, 82%, 100% { opacity: 0; }
-	43% { opacity: 1; }
+#plexigent-emergence-study .px-is-home .px-copy {
+  position: relative;
+  top: auto;
+  margin-top: max(302px, calc((100dvh - 616px) / 2 + 302px));
+  padding: 0 22px 32px;
+  transition: none;
 }
-/* Keep the existing green word-association reveal unaltered; do not restart the pulse clock. */
-.wordmark-stage[data-revealing="true"] .letter-accent { opacity: 0; }
-.wordmark-baseline-probe { position: absolute; top: 0; left: 0; visibility: hidden; pointer-events: none; }
-.wordmark-baseline-probe > span { display: inline-block; width: 0; height: 0; vertical-align: baseline; }
-.wordmark-overlay {
-	position: absolute;
-	top: 0;
-	left: 0;
-	display: inline-flex;
-	color: #79f0a4;
-	opacity: 0;
-	pointer-events: none;
-	transition: opacity 850ms linear;
-	white-space: nowrap;
+#plexigent-emergence-study .px-canvas {
+  max-width: 1100px;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 0;
 }
-.wordmark-overlay.visible { opacity: 1; }
-.borrowed-letter { opacity: 0; }
-.wordmark-measurements {
-	position: absolute;
-	top: 0;
-	left: 0;
-	visibility: hidden;
-	pointer-events: none;
+#plexigent-emergence-study .px-title { font-size: clamp(2.25rem, 6.2vw, 4.125rem); }
+#plexigent-emergence-study .px-is-home .px-title { font-size: clamp(2.875rem, 7.3vw, 5.125rem); }
+#plexigent-emergence-study .px-prompt { font-size: clamp(1rem, 2.4vw, 1.25rem); }
+#plexigent-emergence-study .px-is-home .px-prompt { font-size: .8125rem; }
+#plexigent-emergence-study .px-menu-toggle,
+#plexigent-emergence-study .px-replay,
+#plexigent-emergence-study .px-back,
+#plexigent-emergence-study .px-next { font-size: .875rem; }
+#plexigent-emergence-study .px-kicker { font-size: .8125rem; }
+#plexigent-emergence-study .px-position { font-size: .75rem; white-space: nowrap; }
+#plexigent-emergence-study .px-footer {
+  padding: 20px max(24px, env(safe-area-inset-right)) max(24px, env(safe-area-inset-bottom)) max(24px, env(safe-area-inset-left));
+  min-height: 98px;
 }
-.wordmark-measure { position: absolute; top: 0; left: 0; display: inline-flex; }
-.wordmark-measure > span { display: inline-block; }
-
-.question-trigger {
-	position: absolute;
-	font-family: inherit;
-	top: calc(100% + 18px);
-	left: var(--question-x, 50%);
-	display: grid;
-	width: clamp(44px, 4vw, 56px);
-	height: clamp(44px, 4vw, 56px);
-	padding: 0;
-	place-items: center;
-	border: 0;
-	border-radius: 4px;
-	color: #fff;
-	background: transparent;
-	cursor: pointer;
-	transform: translateX(-50%);
-	opacity: 1;
-	transition: opacity 400ms ease;
-	-webkit-tap-highlight-color: transparent;
-	touch-action: manipulation;
+#plexigent-emergence-study .px-next { text-decoration: none; white-space: normal; text-align: center; }
+#plexigent-emergence-study .px-back { padding: 0 4px; }
+#plexigent-emergence-study .px-menu { flex: 1; padding-bottom: max(36px, env(safe-area-inset-bottom)); }
+#plexigent-emergence-study .px-menu-nav a { font-size: clamp(1.5rem, 3.5vw, 2rem); }
+#plexigent-emergence-study .px-menu-secondary a { font-size: .9375rem; }
+#plexigent-emergence-study :is(a, button):focus-visible {
+  outline: 1px solid var(--px-cyan);
+  outline-offset: 6px;
+  border-radius: 2px;
 }
-.question-trigger span {
-	font-family: inherit;
-	font-size: clamp(28px, 3vw, 40px);
-	font-weight: 400;
-	line-height: 1;
+#plexigent-emergence-study .px-title:focus,
+#plexigent-emergence-study .px-scene:focus { outline: none; }
+#plexigent-emergence-study .px-fallback {
+  position: absolute; top: 40px; left: 50%; transform: translateX(-50%); width: min(70%, 280px); height: 240px;
 }
-.phase-done .question-trigger:not(.hidden) { animation: question-in 500ms 650ms both; }
-@keyframes question-in { from { opacity: 0; } to { opacity: 1; } }
-.question-trigger:focus-visible { outline: 2px solid #79f0a4; outline-offset: 3px; }
-.question-trigger.hidden { opacity: 0; pointer-events: none; }
-.question-trigger:disabled { cursor: default; }
-@media (hover: hover) {
-	.question-trigger:hover { color: var(--node-bright, #f3fffc); text-shadow: 0 0 12px rgba(187,245,235,.3); }
+@media (min-width: 541px) {
+  #plexigent-emergence-study .px-header { padding: max(32px, env(safe-area-inset-top)) max(38px, env(safe-area-inset-right)) 0 max(38px, env(safe-area-inset-left)); }
+  #plexigent-emergence-study .px-footer { padding-left: max(38px, env(safe-area-inset-left)); padding-right: max(38px, env(safe-area-inset-right)); }
+}
+@media (max-width: 540px) {
+  #plexigent-emergence-study .px-footer { grid-template-columns: 44px minmax(0, 1fr) 44px; gap: 6px; }
+  #plexigent-emergence-study .px-title { font-size: clamp(2.125rem, 8.8vw, 2.9375rem); }
+  #plexigent-emergence-study .px-is-home .px-title { font-size: clamp(2.9375rem, 13vw, 4.0625rem); }
+  #plexigent-emergence-study .px-scene { padding-top: max(92px, calc((100dvh - 616px) / 2 + 92px)); }
+  #plexigent-emergence-study .px-menu-nav a { padding-block: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
-	.scene-canvas, .butterfly-rest, .butterfly-layer, .letter-accent-pulse { animation: none !important; }
-	.wordmark-stage, .wordmark-overlay, .base-letter, .letter-accent, .question-trigger { transition-duration: 120ms; }
-	.question-trigger { animation: none !important; }
+  #plexigent-emergence-study *, #plexigent-emergence-study *::before, #plexigent-emergence-study *::after { scroll-behavior: auto; }
+}
+
+#plexigent-emergence-study .px-title { overflow-wrap: anywhere; }
+#plexigent-emergence-study .px-contact { font-size: 1.0625rem; overflow-wrap: anywhere; max-width: 100%; }
+
+#plexigent-emergence-study .px-about-purpose { display: none; }
+#plexigent-emergence-study .px-about .px-about-purpose {
+  display: block;
+  max-width: 46ch;
+  margin: 1.25rem auto 0;
+  color: var(--px-muted);
+  font-size: 1rem;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+#plexigent-emergence-study .px-about::before {
+  content: "";
+  display: block;
+  width: min(11rem, 50%);
+  height: 3.25rem;
+  margin: 0 auto 1.5rem;
+  background: url("./assets/chrysalis-line-art.png") center / contain no-repeat;
+  opacity: .65;
 }

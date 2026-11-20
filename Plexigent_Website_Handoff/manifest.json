@@ -1,0 +1,117 @@
+{
+  "handoff_version": "1.0",
+  "created_date": "2026-11-01",
+  "approved_reference_sha256": "11617b5f9b3806803364a6c41d9062c2784f3b9cfd3688c7e288fb0f1750a778",
+  "files": [
+    {
+      "path": ".gitignore",
+      "size_bytes": 19,
+      "sha256": "025c851d4bca2bfe26fe7117a30f7b9e57de7df18fd7fe3c6629e82251b65a95"
+    },
+    {
+      "path": "ACCEPTANCE.md",
+      "size_bytes": 5749,
+      "sha256": "e52f5b03dfa0f694d6ff803a39dd1d4fe2ed6f5a26bb1a8f68ddb42f6c04e70d"
+    },
+    {
+      "path": "AGENTS.md",
+      "size_bytes": 1013,
+      "sha256": "f99c6194381ad3b40b47d41f492bcbabb2f3a3dc1268eab35c6807d8fc6c2297"
+    },
+    {
+      "path": "ARCHITECTURE.md",
+      "size_bytes": 6985,
+      "sha256": "a77eca3121698a0d923149ca5fcad10e95779c905513ee066cd452ac4874092f"
+    },
+    {
+      "path": "CODEX_PROMPT.md",
+      "size_bytes": 1624,
+      "sha256": "901b314ba876d83d6339aa99e10364e29bc9fe863a33f1b3e643db89fd8d3ea6"
+    },
+    {
+      "path": "DESIGN_CONTRACT.md",
+      "size_bytes": 5146,
+      "sha256": "39c66faf82085a9d0b6392e47f02f6a3d46927a2cc3a0c1fc64a91e5b06a5452"
+    },
+    {
+      "path": "IMPLEMENTATION_PLAN.md",
+      "size_bytes": 3046,
+      "sha256": "62cddd9d7f1eddf7552b0f4018fae2f7050e6c82d57b17fa981bf120dad0f0d0"
+    },
+    {
+      "path": "MOTION_SPEC.md",
+      "size_bytes": 5090,
+      "sha256": "99264bc1f94e1074ad93824d9265eb03289391c58af5d90b6dd4617ace254126"
+    },
+    {
+      "path": "START_HERE.md",
+      "size_bytes": 5628,
+      "sha256": "7669c994d93ad4888b417631a08de67bef821d834fe60f368783b762753f9c0d"
+    },
+    {
+      "path": "STATUS.md",
+      "size_bytes": 3058,
+      "sha256": "c8d0e27a4dc44b5d7824a858335c3f73b7c0da76c72749959e31893881cafddb"
+    },
+    {
+      "path": "assets/caterpillar-line-art.png",
+      "size_bytes": 77866,
+      "sha256": "7f2a053835d937eff963d3c631f01429e7e9c5d28b4f871f10baa20d01eac990"
+    },
+    {
+      "path": "assets/chrysalis-line-art.png",
+      "size_bytes": 68566,
+      "sha256": "bb6dd84681800ae7518b88e254b24ec17efa890eb60084a8e7a682d2d579117b"
+    },
+    {
+      "path": "assets/original-geometry.json",
+      "size_bytes": 50813,
+      "sha256": "5dafa57a365f8a7348f1ae9198b94076b78e41e8bc695e6b3020ab568001b5af"
+    },
+    {
+      "path": "checks/RESULTS.md",
+      "size_bytes": 854,
+      "sha256": "2b0caef85be032341c56d55afdb4852b2f4cb073cf06716997de9dd68c798a63"
+    },
+    {
+      "path": "contract.json",
+      "size_bytes": 3909,
+      "sha256": "196f9bcf0d66f89785a3dedf2a8323eb1738f4a5cbb5fcbe5f19166c20c4183a"
+    },
+    {
+      "path": "reference/approved-study.fragment.html",
+      "size_bytes": 247171,
+      "sha256": "11617b5f9b3806803364a6c41d9062c2784f3b9cfd3688c7e288fb0f1750a778"
+    },
+    {
+      "path": "reference/index.html",
+      "size_bytes": 247464,
+      "sha256": "6cbd16431c95937703db7451c5c60281b8e7869295267eea1f0559c103aa016d"
+    },
+    {
+      "path": "repo-guidance/AGENTS.append.md",
+      "size_bytes": 1138,
+      "sha256": "35db46c74d6f7b22353ab9425ce908a20051084e565ccc1a85ff2318b1a45ed3"
+    },
+    {
+      "path": "tools/make_qa.py",
+      "size_bytes": 2009,
+      "sha256": "62d5ce2a3a3ddd6ed2c51bb4476d670bd58cf4341968204d188e64998e7c240d"
+    },
+    {
+      "path": "tools/preview.py",
+      "size_bytes": 1203,
+      "sha256": "0e6555211bc770f7db3ed50eb7fa84451b28842436bfe8ce6013de13adda5882"
+    },
+    {
+      "path": "tools/reference_tools.py",
+      "size_bytes": 665,
+      "sha256": "dee51211323e9ccae786ab589420ce56a54e74d1a25815d801e9a468c1031eed"
+    },
+    {
+      "path": "tools/verify.py",
+      "size_bytes": 2505,
+      "sha256": "5fac14362ffba06ee18b5f6303ca104005dc0165729acb13961164ad31585a2b"
+    }
+  ]
+}

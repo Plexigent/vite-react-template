@@ -1,0 +1,8 @@
+Implement the approved Plexigent website experience in this repository. Begin by reading `Plexigent_Website_Handoff/START_HERE.md`, its referenced design, architecture, motion, acceptance, and status documents, and the existing repository instructions. Verify the package and watch `Plexigent_Website_Handoff/reference/index.html` before changing source.
+
+The exact included study is the visual and behavioral baseline. Preserve every meaningful aspect of it: the wordless dots → caterpillar consumption → chrysalis metamorphosis → connected-dot butterfly/eureka sequence, cyan-accented xi, elegant stable compositions, smooth transitions, all four domains, and direct menu access including About Us and Contact.
+
+You are explicitly authorized to refactor or replace old implementation code, remove superseded mechanisms, and choose appropriate free tooling. Do not preserve older architecture at the expense of the approved result. Keep the deployed site entirely compatible with Cloudflare Free.
+
+Work on an appropriate feature branch while preserving unrelated changes. Merge the supplied durable guidance into root AGENTS.md and update the actual architecture document and implementation status. Implement fully, run the available browser/interaction/performance checks, compare against the frozen reference, and prepare a working preview for laptop and phone review. Distinguish emulation from testing on actual iOS and Android hardware. Keep progressing through all independent work; do not stop after writing a plan or merely describing changes. Report the preview, evidence, and any remaining release checks.
+

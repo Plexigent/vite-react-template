@@ -1,103 +1,58 @@
-# React + Vite + Hono + Cloudflare Workers
+# Plexigent — Connecting Dots
 
-[![Deploy to Cloudflare](https://deploy.workers.cloudflare.com/button)](https://deploy.workers.cloudflare.com/?url=https://github.com/cloudflare/templates/tree/main/vite-react-template)
+The approved wordless metamorphosis and four-domain experience, implemented in React, TypeScript and Canvas. Builds to static assets compatible with Cloudflare Free.
 
-Prompts to ensure context continuity:
-Start a new session with:
-Use productArchitecture.md as project continuity. First inspect the current repo state before editing.
+Read `ARCHITECTURE.md`, `IMPLEMENTATION_STATUS.md` and `checks/RESULTS.md` for implementation and validation status. The original handoff remains intact under `Plexigent_Website_Handoff/`.
 
-Then give one task only:
-Today’s task: refine/fix [specific animation beat].
+## Local development and review
 
-Keep it updated at the end of major sessions:
-Update productArchitecture.md with durable decisions only. Remove obsolete details.
+Use Node 24 or newer (`nvm use` reads `.nvmrc`). On a clean checkout:
 
-Do not paste the whole old chat. Use the file plus the current task.
-
-
-This template provides a minimal setup for building a React application with TypeScript and Vite, designed to run on Cloudflare Workers. It features hot module replacement, ESLint integration, and the flexibility of Workers deployments.
-
-![React + TypeScript + Vite + Cloudflare Workers](https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/fc7b4b62-442b-4769-641b-ad4422d74300/public)
-
-<!-- dash-content-start -->
-
-🚀 Supercharge your web development with this powerful stack:
-
-- [**React**](https://react.dev/) - A modern UI library for building interactive interfaces
-- [**Vite**](https://vite.dev/) - Lightning-fast build tooling and development server
-- [**Hono**](https://hono.dev/) - Ultralight, modern backend framework
-- [**Cloudflare Workers**](https://developers.cloudflare.com/workers/) - Edge computing platform for global deployment
-
-### ✨ Key Features
-
-- 🔥 Hot Module Replacement (HMR) for rapid development
-- 📦 TypeScript support out of the box
-- 🛠️ ESLint configuration included
-- ⚡ Zero-config deployment to Cloudflare's global network
-- 🎯 API routes with Hono's elegant routing
-- 🔄 Full-stack development setup
-- 🔎 Built-in Observability to monitor your Worker
-
-Get started in minutes with local development or deploy directly via the Cloudflare dashboard. Perfect for building modern, performant web applications at the edge.
-
-<!-- dash-content-end -->
-
-## Getting Started
-
-To start a new project with this template, run:
-
-```bash
-npm create cloudflare@latest -- --template=cloudflare/templates/vite-react-template
-```
-
-A live deployment of this template is available at:
-[https://react-vite-template.templates.workers.dev](https://react-vite-template.templates.workers.dev)
-
-## Development
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-Start the development server with:
-
-```bash
+```sh
+npm ci
+npm run check
 npm run dev
 ```
 
-Your application will be available at [http://localhost:5173](http://localhost:5173).
+Open the Local URL printed by Vite. `dev` binds to the LAN so a phone on the same trusted Wi-Fi can use the printed Network URL. This is an HTTP local preview, not the required HTTPS release preview.
 
-## Production
+Review the production build with:
 
-Build your project for production:
-
-```bash
+```sh
 npm run build
-```
-
-Preview your build locally:
-
-```bash
 npm run preview
 ```
 
-Deploy your project to Cloudflare Workers:
+Dev-only deterministic times are in **seconds**: `/?sceneTime=0.5`, `2.6`, `4.8`, `8.9`, `12.1`, or `14.6`. These do not work in production. Development DOM attributes report time, phase, draw count, frame p95/p99 and average JavaScript draw time; they do not measure GPU time or certify device performance.
 
-```bash
-npm run build && npm run deploy
+The reference can be viewed from the dev server at `/Plexigent_Website_Handoff/reference/index.html`. To generate its frozen fixtures:
+
+```sh
+python3 Plexigent_Website_Handoff/tools/make_qa.py
 ```
 
-Monitor your workers:
+Open `/Plexigent_Website_Handoff/_qa/index.html` on the dev server. Reference/QA files are outside `public` and are not part of the deployed build.
 
-```bash
-npx wrangler tail
+## Checks
+
+- `npm test`: reference integrity, 48 exact canvas-command comparisons, domain geometry, motion clock, route/copy contracts and simulated-DOM controller integration.
+- `npm run build`: TypeScript and Vite production build to `dist/client`.
+- `npm run test:build`: static hosting limits, no leaked development hooks, plus renderer checks.
+- `npm run check`: runs the above in order.
+- `npm run lint`: project lint.
+- `npm run deploy:check`: Wrangler static-deployment dry-run (no publication).
+- `python3 Plexigent_Website_Handoff/tools/verify.py`: checks the immutable handoff manifest.
+
+See `checks/BROWSER_REVIEW.md` for the browser/physical-device acceptance that remains unperformed.
+
+## Deployment
+
+The existing Wrangler name is retained. `npm run deploy` validates/builds and deploys static assets with SPA fallback; it requires the account's existing authentication. It has **not** been run. For Cloudflare Pages, build with `npm run build`, publish `dist/client`, and keep SPA routing enabled. No backend or paid service is required.
+
+Before a release, confirm the account's production branch/auto-deploy settings and current rollback version, create an HTTPS preview, and complete the recorded browser/device review. Do not push to `main` merely to obtain a preview.
+
+The SVG/favicon and social image can be regenerated on macOS, without affecting the web runtime:
+
+```sh
+swift -module-cache-path /tmp/plexigent-swift-cache scripts/generate-brand-assets.swift
 ```
-
-## Additional Resources
-
-- [Cloudflare Workers Documentation](https://developers.cloudflare.com/workers/)
-- [Vite Documentation](https://vitejs.dev/guide/)
-- [React Documentation](https://reactjs.org/)
-- [Hono Documentation](https://hono.dev/)

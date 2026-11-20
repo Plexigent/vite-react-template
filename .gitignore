@@ -197,3 +197,9 @@ dist
 !.env.example
 .dev.vars*
 !.dev.vars.example
+
+# Generated reference fixtures and browser reports
+Plexigent_Website_Handoff/_qa/
+checks/screenshots/
+playwright-report/
+test-results/

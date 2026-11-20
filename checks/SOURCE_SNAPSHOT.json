@@ -1,0 +1,70 @@
+{
+  "date": "2026-11-20",
+  "base_commit": "7a02f6ed7f518936b9b7e22bf886198464d28a1d",
+  "worktree": "uncommitted on main; git metadata read-only",
+  "source_sha256": "197042f276eeaaa0b5b095166751932370b1c69290979a435f9275653a09f2b5",
+  "files": {
+    ".nvmrc": "68ca3fba3b7e864770cb61aeb306d4bd4354b68ab4dd38450860c5d823e42a53",
+    "index.html": "6122b66ef8eb90cbf9417783b7ee99644f35c6edb3c7dd32b0cfd27a9ea18899",
+    "package-lock.json": "874502614b71b69eee375e0b4876f1b7522647a5835cbb0ce58f52535ffc77cc",
+    "package.json": "7a9bde4a205c6ba7036c29f312bc2b312f88ae9cdb4cd3c287dd51224777f114",
+    "public/plexigent-butterfly.svg": "f5a56166056d4849bfe6de4396e0ff71585b85ff02cf988aece03a0984ebfa78",
+    "public/plexigent-connected-butterfly.svg": "cfaf4b3f9c7f7d191a6dfa07c94255e44be430461eb7a88e777ace594b1b07df",
+    "public/plexigent-social.png": "e9e3ac8f186d59e8fdc799138c67206afc7ea7641bff9d5bd0f805fce0a86420",
+    "scripts/controller.test.mjs": "c0cf59f3aa143dc8225bcedf3bf1b09a555939457b6a48e4197b3803dd3fa7be",
+    "scripts/experience.test.mjs": "b7f0d1070fba483afa775503a0a73693edbc65a49a6f68dd60561939c08d9b75",
+    "scripts/generate-brand-assets.swift": "0d291295a53dfc7f47257c0d6afbf586be0cb833f582ffedc74bfc8afba020ce",
+    "src/react-app/App.css": "a51d76b41a327a555f0d632cddac89cc5e9fc6de4c696d838d0844c5d5842f53",
+    "src/react-app/App.tsx": "70ea3f17ed69267b2f254b3e13c182af38ce58f7558609aa316c5d9bb63385fa",
+    "src/react-app/assets/caterpillar-line-art.png": "7f2a053835d937eff963d3c631f01429e7e9c5d28b4f871f10baa20d01eac990",
+    "src/react-app/assets/chrysalis-line-art.png": "bb6dd84681800ae7518b88e254b24ec17efa890eb60084a8e7a682d2d579117b",
+    "src/react-app/experience/clock.ts": "1a594d466d7629d0e74b773d727a5c1667ec22bed66176509de8f19756bde8a2",
+    "src/react-app/experience/controller.ts": "0d8df8dacd8427372f0034a3ca24c327ab09c0654033e0123b7d46857a6a9623",
+    "src/react-app/experience/domains.ts": "fa6d0d9edd55d7bda51ce38b6f5dbcc5463baf1a25a5b574728b24d0902b23e3",
+    "src/react-app/experience/geometry.json": "5dafa57a365f8a7348f1ae9198b94076b78e41e8bc695e6b3020ab568001b5af",
+    "src/react-app/experience/opening.ts": "6b8025d1d80d5cbe71b87552462585c326e88e8b64b93dd999d0761acfa8c490",
+    "src/react-app/experience/pages.ts": "0ea6a64c1e1565ebbe0607412a7b4f87c29a13ffc5ba6860f3c0e32787afd096",
+    "src/react-app/index.css": "1f5e1358b80008976ed5fb6a013978e2b343650a6ccb219ada555855dd1fca97",
+    "src/react-app/main.tsx": "d7523fa771a67f5ba96e06e12446873d6c6e2410792f72abbd42d6b3f60556ac",
+    "src/react-app/vite-env.d.ts": "65996936fbb042915f7b74a200fcdde7e410f32a669b1ab9597cfaa4b0faddb5",
+    "tsconfig.app.json": "ff80d8cc140292fd0a4d435b6b4c17cf91718cb748b641ad96b812e33403dae9",
+    "tsconfig.json": "3a11d1d758b82ceae1687b3b3b673d98febb16b81305239be576b6aa30148fed",
+    "tsconfig.node.json": "edd176df52ed8dfd3eafae19703d22605df1b5290d697385d81b1c138d368920",
+    "vite.config.ts": "13bcaa10b4462ad87503b72f818812ae0403222f747b6c824b88535bbc7feb8d",
+    "wrangler.json": "77e6e92af3c7cae347fc0195b0ac972e3b72df857f61ba3d7456dd2aaeb6169d"
+  },
+  "build": {
+    "dist/client/assets/caterpillar-line-art-BwaUx2R6.png": {
+      "bytes": 77866,
+      "sha256": "7f2a053835d937eff963d3c631f01429e7e9c5d28b4f871f10baa20d01eac990"
+    },
+    "dist/client/assets/chrysalis-line-art-2l1na7YM.png": {
+      "bytes": 68566,
+      "sha256": "bb6dd84681800ae7518b88e254b24ec17efa890eb60084a8e7a682d2d579117b"
+    },
+    "dist/client/assets/index-B5EXYQPh.css": {
+      "bytes": 11605,
+      "sha256": "d855bdb3cbef3ad899d07833a65baa66f39d4536620d344c8464b0a5be7dcca8"
+    },
+    "dist/client/assets/index-DmX0UEsv.js": {
+      "bytes": 234650,
+      "sha256": "5e8c988a2557caeb5e45ea580f892753318e17de5fbb496416365906b6608ced"
+    },
+    "dist/client/index.html": {
+      "bytes": 1563,
+      "sha256": "1d816993a02480d26129a691b7a27269e484ca58eb95bc3544f433a7c68a00ef"
+    },
+    "dist/client/plexigent-butterfly.svg": {
+      "bytes": 1539,
+      "sha256": "f5a56166056d4849bfe6de4396e0ff71585b85ff02cf988aece03a0984ebfa78"
+    },
+    "dist/client/plexigent-connected-butterfly.svg": {
+      "bytes": 9861,
+      "sha256": "cfaf4b3f9c7f7d191a6dfa07c94255e44be430461eb7a88e777ace594b1b07df"
+    },
+    "dist/client/plexigent-social.png": {
+      "bytes": 60011,
+      "sha256": "e9e3ac8f186d59e8fdc799138c67206afc7ea7641bff9d5bd0f805fce0a86420"
+    }
+  }
+}

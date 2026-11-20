@@ -1,0 +1,178 @@
+{
+  "schema_version": 1,
+  "handoff_version": "1.0",
+  "recorded_date": "2026-11-01",
+  "timezone": "America/New_York",
+  "owner": "Paul Crimm",
+  "target_site": "https://plexigent.com/",
+  "reference": {
+    "path": "reference/approved-study.fragment.html",
+    "standalone": "reference/index.html",
+    "sha256": "11617b5f9b3806803364a6c41d9062c2784f3b9cfd3688c7e288fb0f1750a778",
+    "preserve_bytes": true
+  },
+  "implementation_policy": {
+    "legacy_code_may_be_replaced": true,
+    "visual_and_motion_fidelity_required": true,
+    "cloudflare_free_required": true,
+    "repo_not_yet_inspected": true
+  },
+  "brand": {
+    "moniker": "xi",
+    "cyan_stroke": "forward / stroke of x",
+    "cyan_i_part": "dot",
+    "six_spelling": "SiX",
+    "six_meaning": "Super intelligent “X”",
+    "secondary_icon": "original connected-dot butterfly"
+  },
+  "palette": {
+    "background": "#070b10",
+    "ink": "#f1f4f5",
+    "muted": "#a2aeb5",
+    "cyan": "#4ce2f2"
+  },
+  "opening": {
+    "duration_seconds": 14.6,
+    "wordless": true,
+    "initial_state": "home",
+    "phases": [
+      "random dots",
+      "caterpillar consumption",
+      "chrysalis metamorphosis",
+      "connected-dot butterfly / elegant eureka"
+    ],
+    "wordmark_start_seconds": 13.15,
+    "qa_keyframes": [
+      {
+        "name": "random-dots",
+        "seconds": 0.5
+      },
+      {
+        "name": "gathering",
+        "seconds": 2.6
+      },
+      {
+        "name": "consumption",
+        "seconds": 4.8
+      },
+      {
+        "name": "chrysalis",
+        "seconds": 8.9
+      },
+      {
+        "name": "emergence",
+        "seconds": 12.1
+      },
+      {
+        "name": "butterfly",
+        "seconds": 14.6
+      }
+    ]
+  },
+  "domain_transition": {
+    "duration_ms": 720,
+    "outgoing_copy_ms": 180,
+    "incoming_copy_ms": 468,
+    "particle_easing": "1 - (1 - p)^3",
+    "incoming_easing": "cubic-bezier(.16,1,.3,1)"
+  },
+  "menu": [
+    "Plexigent Labs",
+    "Plexigent Dynamic UX",
+    "Plexigent Engineering SiX",
+    "Plexigent Back Office SiX",
+    "About Us",
+    "Contact"
+  ],
+  "states": [
+    {
+      "id": "home",
+      "label": "Plexigent",
+      "copy": "Connecting Dots",
+      "next": "labs",
+      "invitation": "What if?"
+    },
+    {
+      "id": "labs",
+      "label": "Plexigent Labs",
+      "copy": "What happens beyond the obvious?",
+      "next": "dynamic-ux",
+      "invitation": "What if it understood?"
+    },
+    {
+      "id": "dynamic-ux",
+      "label": "Plexigent Dynamic UX",
+      "copy": "What if the interface understood?",
+      "next": "engineering-six",
+      "invitation": "What becomes possible?"
+    },
+    {
+      "id": "engineering-six",
+      "label": "Plexigent Engineering SiX",
+      "copy": "What if a constraint became a breakthrough?",
+      "next": "back-office-six",
+      "invitation": "What could move itself?"
+    },
+    {
+      "id": "back-office-six",
+      "label": "Plexigent Back Office SiX",
+      "copy": "What if the work moved itself?",
+      "next": "home",
+      "invitation": "What comes next?"
+    },
+    {
+      "id": "about",
+      "label": "About Us",
+      "copy": "Paul Crimm · Founder",
+      "next": "contact",
+      "invitation": "Start a conversation"
+    },
+    {
+      "id": "contact",
+      "label": "Contact",
+      "copy": "What are you imagining?",
+      "next": "home",
+      "invitation": "Return to Plexigent",
+      "email": "paul@plexigent.com"
+    }
+  ],
+  "native_device_validation": {
+    "mac_safari": "not tested",
+    "physical_iphone_safari": "not tested",
+    "physical_android_chrome": "not tested"
+  },
+  "test_viewports_css_pixels": [
+    [
+      320,
+      568
+    ],
+    [
+      360,
+      800
+    ],
+    [
+      390,
+      844
+    ],
+    [
+      430,
+      932
+    ],
+    [
+      768,
+      1024
+    ],
+    [
+      1366,
+      768
+    ],
+    [
+      1440,
+      900
+    ],
+    [
+      1920,
+      1080
+    ]
+  ]
+}

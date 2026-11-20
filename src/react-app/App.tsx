@@ -1,239 +1,58 @@
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
-import { flushSync } from "react-dom";
-import { ParticleScene } from "./ParticleScene";
-import type { Phase } from "./sceneModel";
-import { clearAccentCache, measureAccent } from "./wordmarkAccents";
-import "./App.css";
+import { useEffect, useRef } from 'react';
+import { mountExperience } from './experience/controller';
+import { pages } from './experience/pages';
+import './App.css';
 
-type RevealWord = { baseStart: number; length: number; text: string; wordStart: number };
-const WORDMARK = "Plexigent";
-const REVEAL_WORDS = ["ComPlex", "exigent", "Intelligent", "Plexippus"];
-
-function getRevealWord(text: string): RevealWord {
-	const base = WORDMARK.toLowerCase();
-	const word = text.toLowerCase();
-	let best = {
-		baseStart: 0,
-		length: 0,
-		wordStart: 0,
-	};
-
-	for (let baseStart = 0; baseStart < base.length; baseStart += 1) {
-		for (let wordStart = 0; wordStart < word.length; wordStart += 1) {
-			let length = 0;
-
-			while (
-				base[baseStart + length] &&
-				word[wordStart + length] &&
-				base[baseStart + length] === word[wordStart + length]
-			) {
-				length += 1;
-			}
-
-			if (length > best.length) {
-				best = { baseStart, length, wordStart };
-			}
-		}
-	}
-
-	return { ...best, text };
+function Mark() {
+  return <span className="px-mark" aria-hidden="true">
+    <span className="px-glyph px-glyph-x">x<span className="px-accent">x</span></span>
+    <span className="px-glyph px-glyph-i">i<span className="px-accent">i</span></span>
+  </span>;
 }
 
-function isMatchedLetter(index: number, revealWord: RevealWord | undefined) {
-	if (!revealWord) {
-		return false;
-	}
+export default function App() {
+  const root = useRef<HTMLDivElement>(null);
+  useEffect(() => mountExperience(root.current!), []);
 
-	return (
-		index >= revealWord.baseStart &&
-		index < revealWord.baseStart + revealWord.length
-	);
+  return <div id="plexigent-emergence-study" ref={root} aria-label="Plexigent emergence experience">
+    <div className="px-stage">
+      <header className="px-header">
+        <a className="px-home" href="/" aria-label="Plexigent home" data-go="0"><Mark /></a>
+        <button className="px-menu-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="plexigent-concept-menu">
+          <span className="px-menu-label">Menu</span><span className="px-menu-lines" aria-hidden="true" />
+        </button>
+      </header>
+      <div className="px-menu" id="plexigent-concept-menu" hidden>
+        <nav className="px-menu-nav" aria-label="Plexigent domains">
+          {pages.slice(1, 5).map((page, index) => <a key={page.path} href={page.path} data-go={index + 1}>{page.label}</a>)}
+          <div className="px-menu-secondary">
+            {pages.slice(5).map((page, index) => <a key={page.path} href={page.path} data-go={index + 5}>{page.label}</a>)}
+          </div>
+        </nav>
+      </div>
+      <main className="px-scene px-is-home" aria-label="Plexigent domain reveal" tabIndex={-1}>
+        <canvas className="px-canvas" aria-hidden="true" hidden />
+        <canvas className="px-origin" role="img" aria-label="Scattered dots gather into a feeding caterpillar, transform within a chrysalis, and emerge as the connected-dot Plexigent butterfly." />
+        <img className="px-fallback" src="/plexigent-connected-butterfly.svg" alt="Connected-dot Plexigent butterfly" hidden />
+        <div className="px-copy">
+          <p className="px-kicker" hidden>Plexigent</p>
+          <h1 className="px-title px-wordmark" tabIndex={-1} aria-label="Plexigent">Ple<Mark />gent</h1>
+          <p className="px-prompt">Connecting Dots</p>
+          <p className="px-about-purpose">
+            We connect the dots where value is beginning to emerge. For us, that is an act of creation.
+            Together with companies and labs that share our passion, we turn those early connections into things people can use.
+          </p>
+          <a className="px-contact" href="mailto:info@Plexigent.com" hidden>info@Plexigent.com</a>
+        </div>
+      </main>
+      <footer className="px-footer px-waiting">
+        <span className="px-footer-left">
+          <span className="px-position" hidden />
+          <button className="px-replay" type="button" aria-label="Replay the transformation" hidden>Replay</button>
+        </span>
+        <a className="px-next" href="/labs/"><span className="px-next-label">What if?</span><span className="px-chevron" aria-hidden="true" /></a>
+        <button className="px-back" type="button" aria-label="Previous scene" hidden>Back</button>
+      </footer>
+    </div>
+  </div>;
 }
-
-
-function App() {
-	const [phase, setPhase] = useState<Phase>("loading");
-	const stageRef = useRef<HTMLDivElement>(null);
-	const wordmarkRef = useRef<HTMLHeadingElement>(null);
-	const letterRefs = useRef<Array<HTMLSpanElement | null>>([]);
-	const overlayRef = useRef<HTMLSpanElement>(null);
-	const measureRefs = useRef<Array<HTMLSpanElement | null>>([]);
-	const baselineRef = useRef<HTMLSpanElement>(null);
-	const revealWords = useMemo(() => REVEAL_WORDS.map(getRevealWord), []);
-	const [activeRevealIndex, setActiveRevealIndex] = useState<number | null>(null);
-	const [isRevealVisible, setIsRevealVisible] = useState(false);
-	const [isSequenceRunning, setIsSequenceRunning] = useState(false);
-	const sequenceRunRef = useRef(0);
-	const timerRef = useRef(0);
-	const activeReveal = activeRevealIndex === null ? undefined : revealWords[activeRevealIndex];
-
-	useEffect(() => () => {
-		sequenceRunRef.current++;
-		window.clearTimeout(timerRef.current);
-	}, []);
-
-	useLayoutEffect(() => {
-		const stage = stageRef.current;
-		const heading = wordmarkRef.current;
-		if (!stage || !heading) return;
-		let alive = true;
-		const measure = () => {
-			if (!alive) return;
-			const base = heading.querySelector(".wordmark-base") as HTMLElement;
-			const baseWidth = base.getBoundingClientRect().width;
-			const origin = heading.getBoundingClientRect().left;
-			let extent = baseWidth / 2;
-			for (const [index, word] of revealWords.entries()) {
-				const row = measureRefs.current[index];
-				const anchor = letterRefs.current[word.baseStart];
-				const borrowed = row?.children[word.wordStart];
-				if (!row || !anchor || !borrowed) continue;
-				const prefix = borrowed.getBoundingClientRect().left - row.getBoundingClientRect().left;
-				const left = anchor.getBoundingClientRect().left - origin - prefix;
-				extent = Math.max(extent, baseWidth / 2 - left, left + row.getBoundingClientRect().width - baseWidth / 2);
-			}
-			const font = parseFloat(getComputedStyle(heading).fontSize);
-			const desired = Math.min(160, stage.clientWidth * .15, stage.clientHeight * .18);
-			const available = Math.max(1, stage.clientWidth - 40);
-			const fitted = Math.min(desired, font * available / Math.max(1, 2 * extent));
-			if (Math.abs(font - fitted) > .1) heading.style.fontSize = `${fitted}px`;
-			const marker = baselineRef.current;
-			const baseline = marker && marker.parentElement
-				? marker.getBoundingClientRect().top - marker.parentElement.getBoundingClientRect().top : 0;
-			for (const [index, letter] of [[3, "x"], [4, "i"]] as const) {
-				const element = letterRefs.current[index];
-				if (!element) continue;
-				const accent = measureAccent(letter, element, baseline);
-				if (accent) element.style.setProperty("--accent-clip", accent.clip);
-				if (letter === "i") {
-					const bounds = element.getBoundingClientRect();
-					heading.parentElement?.style.setProperty("--question-x", `${bounds.left - heading.getBoundingClientRect().left + (accent?.center ?? bounds.width / 2)}px`);
-				}
-			}
-			if (activeRevealIndex !== null && overlayRef.current) {
-				const row = measureRefs.current[activeRevealIndex];
-				const word = revealWords[activeRevealIndex];
-				const anchor = letterRefs.current[word.baseStart];
-				const borrowed = row?.children[word.wordStart];
-				if (row && anchor && borrowed) {
-					const prefix = borrowed.getBoundingClientRect().left - row.getBoundingClientRect().left;
-					overlayRef.current.style.left = `${anchor.getBoundingClientRect().left - heading.getBoundingClientRect().left - prefix}px`;
-				}
-			}
-		};
-		measure();
-		const observer = new ResizeObserver(measure);
-		observer.observe(stage);
-		const fontsChanged = () => { clearAccentCache(); measure(); };
-		void document.fonts.ready.then(fontsChanged);
-		document.fonts.addEventListener("loadingdone", fontsChanged);
-		return () => { alive = false; observer.disconnect(); document.fonts.removeEventListener("loadingdone", fontsChanged); };
-	}, [activeRevealIndex, revealWords]);
-
-	const startRevealSequence = async () => {
-		if (isSequenceRunning) return;
-		const runId = ++sequenceRunRef.current;
-		const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-		const fade = reduced ? 120 : 850;
-		const wait = (duration: number) => new Promise<void>(resolve => {
-			timerRef.current = window.setTimeout(resolve, duration);
-		});
-		setIsSequenceRunning(true);
-		for (let index = 0; index < revealWords.length; index++) {
-			if (sequenceRunRef.current !== runId) return;
-			flushSync(() => { setActiveRevealIndex(index); setIsRevealVisible(false); });
-			await wait(40);
-			if (sequenceRunRef.current !== runId) return;
-			setIsRevealVisible(true);
-			await wait(fade + 1150);
-			if (sequenceRunRef.current !== runId) return;
-			setIsRevealVisible(false);
-			await wait(fade);
-		}
-		if (sequenceRunRef.current === runId) {
-			setActiveRevealIndex(null);
-			setIsSequenceRunning(false);
-		}
-	};
-
-	return (
-		<main className={`landing phase-${phase}`} aria-label="Plexigent introduction">
-			<div className="aura aura-one" aria-hidden="true" />
-			<div className="aura aura-two" aria-hidden="true" />
-			<div className="signal-grid" aria-hidden="true" />
-			<div className="scene-safe-area">
-				<div className="scene-stage" ref={stageRef}>
-					<ParticleScene stageRef={stageRef} onPhase={setPhase} />
-					<div className="wordmark-stage" data-revealing={isSequenceRunning}>
-						<h1 className="wordmark" ref={wordmarkRef}>
-							<span className="wordmark-base" aria-label={WORDMARK}>
-								{WORDMARK.split("").map((letter, index) => (
-									<span
-										key={`${letter}-${index}`}
-										ref={(element) => {
-											letterRefs.current[index] = element;
-										}}
-										className={`base-letter ${
-											isRevealVisible && isMatchedLetter(index, activeReveal)
-												? "matched"
-												: ""
-										} ${
-											isRevealVisible && !isMatchedLetter(index, activeReveal)
-												? "dimmed"
-												: ""
-										}`}
-									>
-										{letter}
-										{(index === 3 || index === 4) && <span className="letter-accent" data-glyph={letter} aria-hidden="true">
-											<span className="letter-accent-pulse" data-glyph={letter} />
-										</span>}
-									</span>
-								))}
-							</span>
-							<span className="wordmark-baseline-probe" aria-hidden="true">M<span ref={baselineRef} /></span>
-							{activeReveal ? (
-								<span
-									aria-hidden="true"
-									className={`wordmark-overlay ${isRevealVisible ? "visible" : ""}`}
-									ref={overlayRef}
-								>
-									{activeReveal.text.split("").map((letter, index) => {
-										const isBorrowed =
-											index >= activeReveal.wordStart &&
-											index < activeReveal.wordStart + activeReveal.length;
-
-										return (
-											<span
-												key={`${activeReveal.text}-${letter}-${index}`}
-												className={isBorrowed ? "borrowed-letter" : ""}
-											>
-												{letter}
-											</span>
-										);
-									})}
-								</span>
-							) : null}
-							<span className="wordmark-measurements" aria-hidden="true">
-								{revealWords.map((word, index) => (
-									<span className="wordmark-measure" key={word.text} ref={element => { measureRefs.current[index] = element; }}>
-										{word.text.split("").map((letter, i) => <span key={i}>{letter}</span>)}
-									</span>
-								))}
-							</span>
-						</h1>
-						<button
-							type="button"
-							className={`question-trigger ${isSequenceRunning ? "hidden" : ""}`}
-							aria-label="Reveal Plexigent word associations"
-							onClick={startRevealSequence}
-							disabled={phase !== "done" || isSequenceRunning}
-						>
-							<span aria-hidden="true">?</span>
-						</button>
-					</div>
-				</div>
-			</div>
-		</main>
-	);
-}
-export default App;
